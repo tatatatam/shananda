@@ -1,0 +1,77 @@
+<html>
+<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<table id="example" class="display" style="width:100%">
+  <thead>
+    <tr>
+      <th>Defect Code</th>
+      <th>Defect No</th>
+      <th>Defect StatusId</th>
+      <th>Description</th>
+      <th>Defect Image</th>
+      <!-- <th>Name</th>
+      <th>Position</th>
+      <th>Office</th>
+      <th>Extn.</th>
+      <th>Start date</th>
+      <th>Salary</th> -->
+    </tr>
+  </thead>
+</table>
+
+</html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.js"></script> -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+<!-- <script src=""></script><script src=""></script> -->
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+  $(document).ready(function () {
+    var url_dev = "http://localhost:3000";
+    var url_prod = "http://35.240.149.115:3000"
+    var trigger = 0;
+    var url = trigger===0?url_dev:url_prod;
+    $('#example').DataTable({
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      "processing": true,
+      "ajax": {
+        "url": url
+      },
+      "columns": [
+        { "data": "Defect_Code" },
+        { "data": "Defect_No" },
+        { "data": "Defect_StatusId" },
+        { "data": "Description" },
+        {
+          "data": "Defect_Image",
+          render: function (data, type, row) {
+            // console.log(data)
+            return '<img src="' + data + '" width="150px" height="150px">';
+          }
+        }
+
+        // { "data": "Defect_Code" },
+      ]
+    });
+  });
+
+  // $.ajax({
+  //   'url': 'http://localhost:3000/defect',
+  //   dataType: 'json',
+  //   type: 'GET',
+  //   success: function (result) {
+  //     console.log(result)
+  //   }
+  // });
+
+</script>

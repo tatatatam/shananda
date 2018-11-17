@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  front-sh:
+    image: nginx
+    container_name: front-cust-v1
+    ports:
+      - 8081:80
+      - 3000:443
+    links:
+      - back
+    volumes:
+      - "./index.html:/usr/share/nginx/html"
+    restart: always
+   
+  back:
+    build: ./back/server
+    image:  dev-node:back
+    container_name: back-v1
+    command: yarn run build
+    ports:
+      - 8080:8080
+    volumes:
+      - ./back/server/:/app
+    restart: always
+    
