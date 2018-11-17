@@ -16,7 +16,7 @@ services:
     links:
       - back
     volumes:
-      - "./index.html:/usr/share/nginx/html"
+      - ".:/usr/share/nginx/html"
     restart: always
    
   back:
