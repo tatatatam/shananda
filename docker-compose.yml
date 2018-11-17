@@ -20,7 +20,8 @@ services:
     restart: always
    
   back:
-    image:  dev-node:back
+    build: .
+    image:  dev-ts:back
     container_name: back-v1
     command: yarn run start
     ports:
