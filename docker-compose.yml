@@ -27,6 +27,6 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./back/server/:/app
+      - . :/app
     restart: always
     
