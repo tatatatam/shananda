@@ -9,7 +9,7 @@ services:
 
   front-sh:
     image: nginx
-    container_name: front-cust-v1
+    container_name: front-sh-v1
     ports:
       - 8081:80
       - 3000:443
@@ -23,7 +23,7 @@ services:
     build: ./back/server
     image:  dev-node:back
     container_name: back-v1
-    command: yarn run build
+    command: yarn run start
     ports:
       - 8080:8080
     volumes:

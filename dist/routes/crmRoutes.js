@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const spauth = require("node-sp-auth");
 const request = require("request-promise");
+const dotenv = require("dotenv");
+dotenv.config();
 class Routes {
     routes(app) {
         app.route('/')
@@ -11,25 +13,25 @@ class Routes {
             });
         });
         // Contact 
-        app.route('/contact')
+        app.route('/defect')
             // GET endpoint 
             .get((req, res) => {
             spauth
                 .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
-                username: 'SHO_developer@ananda.co.th',
-                password: 'P@ss-$hodv'
+                username: process.env.SH_USER,
+                password: process.env.SH_PASS
             })
                 .then(data => {
                 var headers = data.headers;
                 headers['Accept'] = 'application/json;odata=verbose';
                 request.get({
-                    url: 'https://ananda365.sharepoint.com/sites/SmartHandover/_api/web',
+                    url: "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items",
                     headers: headers,
                     json: true
                 }).then(response => {
-                    console.log(response.d.Title);
+                    console.log(response);
                     res.status(200).send({
-                        message: response
+                        data: response.d.results
                     });
                 });
             });
