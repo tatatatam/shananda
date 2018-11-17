@@ -20,13 +20,12 @@ services:
     restart: always
    
   back:
-    build: ./back/server
-    image:  dev-node:back
+    image:  8.12.0-stretch  
     container_name: back-v1
     command: yarn run start
     ports:
-      - 8080:8080
+      - 3000:3000
     volumes:
-      - . :/app
+      - . : .
     restart: always
     
