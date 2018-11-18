@@ -1,24 +1,69 @@
 <html>
+<style>
+  select {
+   border: 1px solid #ccc;
+   font-size: 16px;
+   height: 34px;
+   width: 268px;
+   margin-top: 10px;
+  }
+
+</style>
 <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous">
+<h4>PROJECT: IDEO MOBI SUKHUMVIT 66</h4>
+<div>
+  <form>
+    <div class="form-group" >
+      Status <select>
+        <option value="chooseStatus" disable>Please Select Status</option>
+        <option value="open">OPEN</option>
+        <option value="inprogress">IN-PROGRESS</option>
+      </select> <br/>
+    </div>
+    <div class="form-group">
+      Response Company<select>
+        <option value="chooseRespCompany" disable>Please Select Response Company</option>
+        <option value="res_1">Teka (MC)</option>
+        <option value="res_2">สิงหา (INT)</option>
+        <option value="res_3">MITSUBISHI (Lift)</option>
+        <option value="res_4">ระบุ</option>
+      </select><br/>
+    </div>
+    <div class="form-group">
+    Project<select>
+      <option value="chooseProject" disable>Please Select Response Company</option>
+      <option value="project_1">IDEO MOBI SUKHUMVIT 66</option>
+      <option value="project_2">IDEO MOBI SUKHUMVIT 67</option>
+    </div>
+  </select>
+</form>
+<br/>
+  <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;">Request Button</button>
+</div>
+
+<br/>
+<br/>
+<br/>
 <table id="example" class="display" style="width:100%">
   <thead>
     <tr>
-      <th>Defect Code</th>
-      <th>Defect No</th>
-      <th>Defect StatusId</th>
-      <th>Description</th>
-      <th>Defect Image</th>
-      <!-- <th>Name</th>
-      <th>Position</th>
-      <th>Office</th>
-      <th>Extn.</th>
-      <th>Start date</th>
-      <th>Salary</th> -->
+      <th>Code</th>
+      <th>Inspection / Date</th>
+      <th>Title / Description</th>
+      <th>Category / Sub-Category</th>
+      <th>Defect (Image)</th>
+      <th>Status</th>
+      <th>Response Company</th>
+      <th>Target Date</th>
+      <th>Correction (Image)</th>
     </tr>
   </thead>
 </table>
 
 </html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <!-- <script src="https://code.jquery.com/jquery-3.3.1.js"></script> -->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -36,7 +81,7 @@
   $(document).ready(function () {
     var url_dev = "http://localhost:3000";
     var url_prod = "http://35.240.149.115:3000"
-    var trigger = 1;
+    var trigger = 0;
     var url = trigger===0?url_dev:url_prod;
     $('#example').DataTable({
       dom: 'Bfrtip',
@@ -49,29 +94,54 @@
       },
       "columns": [
         { "data": "Defect_Code" },
-        { "data": "Defect_No" },
-        { "data": "Defect_StatusId" },
-        { "data": "Description" },
+        { "data": function (data, type, output) {
+            return data.Inspection.Title+" / "+ moment(data.Created).format('DD/MM/YYYY');
+          } 
+        },
+        { "data": function (data, type, output){
+            var description = "-";
+            if(data.Description) description = data.Description
+            return data.Title+" / "+ description;
+          }
+        },
+        { "data": function (data, type, output) {
+            return data.Category.Title + " / " + data.Sub_x002d_category.Title;
+          }
+        },
         {
           "data": "Defect_Image",
           render: function (data, type, row) {
             // console.log(data)
             return '<img src="' + data + '" width="150px" height="150px">';
           }
-        }
+        },
+        { "data": "Defect_Status.Title" },
+        { "data": "Response_Company.Title" },
+        { "data": function (data, type, row) {
+          var targetDate = moment(data.Target_Date).format('DD/MM/YYYY');
+            return " "+moment(data.Target_Date).format('DD/MM/YYYY');
+          }
+        },
+        {
+          "data": "Defect_Correction_IMG",
+          render: function (data, type, row) {
+            // console.log(data)
+            if(data) return '<img src="' + data + '" width="150px" height="150px">';
+            else  return  "ยังไม่แก้ไข" ;
+          }
+        },
 
-        // { "data": "Defect_Code" },
       ]
     });
   });
 
-  // $.ajax({
-  //   'url': 'http://localhost:3000/defect',
-  //   dataType: 'json',
-  //   type: 'GET',
-  //   success: function (result) {
-  //     console.log(result)
-  //   }
-  // });
+  $.ajax({
+    'url': 'http://localhost:3000/defect',
+    dataType: 'json',
+    type: 'GET',
+    success: function (result) {
+      console.log(result)
+    }
+  });
 
 </script>
