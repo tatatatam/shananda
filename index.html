@@ -66,7 +66,7 @@ crossorigin="anonymous">
         <th>Title / Description</th>
         <th>Category / Sub-Category</th>
         <th>Defect (Image)</th>
-        <th>Defect Image Area</th>
+        <th>Defect Area (Image) </th>
         <th>Status</th>
         <th>Response Company</th>
         <th>Target Date</th>
@@ -244,6 +244,7 @@ crossorigin="anonymous">
      $('#example').DataTable({
       "pageLength": 20,
       // dom: 'Bfrtip',
+      "order": [['1','asc']],
       "processing": true,
       "ajax": {
         "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&page="+pageId,
@@ -282,7 +283,7 @@ crossorigin="anonymous">
         { "data": "Defect_Area_Image",
           render: function (data, type, row) {
             if (data) return '<img src="' + data + '" width="150px" height="150px">';
-            else return "ยังไม่แก้ไข";
+            else return "N/A";
           }
         },
         { "data": "Defect_Status.Title" },
@@ -298,7 +299,7 @@ crossorigin="anonymous">
           render: function (data, type, row) {
             // console.log(data)
             if (data) return '<img src="' + data + '" width="150px" height="150px">';
-            else return "ยังไม่แก้ไข";
+            else return "N/A";
           }
         },
 
@@ -325,7 +326,7 @@ crossorigin="anonymous">
             { "data": "Defect_Code" },
             {
               "data": function (data, type, output) {
-                return data.Inspection.Title + " / " + moment(data.Created).format('DD/MM/YYYY');
+                return data.Inspection.Title + " / " + "("+moment(data.Created).format('DD/MM/YYYY')+")";
               }
             },
             {
