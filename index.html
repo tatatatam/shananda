@@ -258,7 +258,7 @@ crossorigin="anonymous">
         { "data": "Defect_Code" },
         {
           "data": function (data, type, output) {
-            return data.Inspection.Title + " / " + moment(data.Created).format('DD/MM/YYYY');
+            return data.Inspection.Title + " / " +  "(" + moment(data.Created).format('DD/MM/YYYY') + ")";
           }
         },
         {
