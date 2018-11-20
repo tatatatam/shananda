@@ -16,6 +16,39 @@ export class Routes {
           message: 'GET request successfulll!!!!'
         })
       })
+    app.route('/next')
+      .get((req: Request, res: Response) => {
+        // const url = req.body.url;
+        // console.log(req)
+        res.end()
+        // spauth
+        //   .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+        //     username: process.env.SH_USER,
+        //     password: process.env.SH_PASS
+        //   })
+        //   .then(data => {
+        //     var headers = data.headers;
+        //     headers['Accept'] = 'application/json;odata=verbose';
+        //     headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+        //     headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+        //     headers['honorCipherOrder'] = true;
+
+        //     // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items"
+
+        //     request.get({
+        //       url: url,
+        //       headers: headers,
+        //       json: true,
+        //     }).then(response => {
+        //       console.log(response);
+        //       res.status(200).send({
+        //         data: response.d
+        //       })
+        //     });
+        //   }).catch(err => {
+        //     console.log(err)
+        //   })
+      })
     app.route('/filter')
       .get((req: Request, res: Response) => {
         const response_company = req.query.response;
@@ -31,11 +64,11 @@ export class Routes {
         }
 
         // var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=20"
-        var skiptoken = "&$skiptoken=" + pageId + "&$top=20"
+        // var skiptoken = "&$skiptoken=" + pageId 
 
-        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=Defect_Code,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company"
-        url += "&$filter=" + sum_string+skiptoken;
-        console.log(url)
+        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=Defect_Code,Defect_Area_Image,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company"
+        url += "&$filter=" + sum_string +"&$orderby=Defect_Code";
+        // console.log(url)
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
             username: process.env.SH_USER,
@@ -55,9 +88,9 @@ export class Routes {
               headers: headers,
               json: true,
             }).then(response => {
-              console.log(response);
+              // console.log(response);
               res.status(200).send({
-                data: response.d.results
+                data: response.d
               })
             });
           }).catch(err => {
