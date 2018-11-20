@@ -186,17 +186,21 @@
   }
 
   function queryReportByStatusRpCompProject() {
-    var selectedStatus = $("#status-dl").find(':selected').val();
-    var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
-    var selectedProject = $("#project-dl").find(':selected').val()
-    console.log($('#global-num').text())
-    if(selectedProject!="0"){
-      $('#global-num').text(1);
+    // var selectedStatus = $("#status-dl").find(':selected').val();
+    // var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
+    // var selectedProject = $("#project-dl").find(':selected').val()
+    // console.log($('#global-num').text())
+    var selectedStatus = 0
+    var selectedRespCom = 0
+    var selectedProject = 6
+    
+    // if(selectedProject!="0"){
+    // $('#global-num').text(1);
         renderDataTable(selectedRespCom, selectedProject, selectedStatus, 0);
-      }else {
-        // $("#status-dl").wrapInner("<p>Error Herer</p>")
-        alert("You have to choose select project")
-      }
+      // }else {
+      //   // $("#status-dl").wrapInner("<p>Error Herer</p>")
+      //   alert("You have to choose select project")
+      // }
   }
    function nextQueryReport() {
       var selectedStatus = $("#status-dl").find(':selected').val();
