@@ -49,7 +49,10 @@
  
   <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="queryReportByStatusRpCompProject()">Request Button</button>
 </div>
-
+<div
+<div id="global-num">0</div>
+<button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="previousQueryReport()">Request Previous</button>
+<button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="nextQueryReport()">Request Next</button>
 <br/>
 <br/>
 <br/>
@@ -69,6 +72,7 @@
   </thead>
 </table>
 
+
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -85,11 +89,6 @@
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-  // <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="nextQueryReport()">Request
-  // Button</button>
-  //     <div id="global-num">0</div>
-  //     <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="previousQueryReport()">Request
-  //   Button</button>
 
   var url_dev = "http://localhost:3000";
   var url_prod = "http://35.240.149.115:3000";
@@ -159,48 +158,46 @@
         for(var i=0;i<result.length;i+=1){
          $('#rp-comp-dl').append('<option value="'+result[i].Id+'" disable>'+result[i].Title+'</option>');
         }
-     }
-    });
-     $.ajax({
-      'url': url + '/dropdownlist?dropdownlist=project',
-      dataType: 'json',
-      type: 'GET',
-      success: function (response) {
-        var result = response.data
-        for (var i = 0; i < result.length; i += 1) {
-          $('#project-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
-        }
-      }
-    });
-     $.ajax({
-      'url': url + '/dropdownlist?dropdownlist=status',
-      dataType: 'json',
-      type: 'GET',
-      success: function (response) {
-        var result = response.data
-        for (var i = 0; i < result.length; i += 1) {
-          $('#status-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
-        }
+     
+        $.ajax({
+         'url': url + '/dropdownlist?dropdownlist=project',
+         dataType: 'json',
+         type: 'GET',
+         success: function (response) {
+           var result = response.data
+           for (var i = 0; i < result.length; i += 1) {
+             $('#project-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+           }
+           $.ajax({
+            'url': url + '/dropdownlist?dropdownlist=status',
+            dataType: 'json',
+            type: 'GET',
+            success: function (response) {
+              var result = response.data
+              for (var i = 0; i < result.length; i += 1) {
+                $('#status-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+              }
+            }
+          });
+         }
+       });
       }
     });
   }
 
   function queryReportByStatusRpCompProject() {
-    // var selectedStatus = $("#status-dl").find(':selected').val();
-    // var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
-    // var selectedProject = $("#project-dl").find(':selected').val()
-    // console.log($('#global-num').text())
-    var selectedStatus = 0
-    var selectedRespCom = 0
-    var selectedProject = 6
+    var selectedStatus = $("#status-dl").find(':selected').val();
+    var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
+    var selectedProject = $("#project-dl").find(':selected').val()
+    console.log($('#global-num').text())
     
-    // if(selectedProject!="0"){
-    // $('#global-num').text(1);
+    if(selectedProject!="0"){
+    $('#global-num').text(1);
         renderDataTable(selectedRespCom, selectedProject, selectedStatus, 0);
-      // }else {
-      //   // $("#status-dl").wrapInner("<p>Error Herer</p>")
-      //   alert("You have to choose select project")
-      // }
+      }else {
+        // $("#status-dl").wrapInner("<p>Error Herer</p>")
+        alert("You have to choose select project")
+      }
   }
    function nextQueryReport() {
       var selectedStatus = $("#status-dl").find(':selected').val();
@@ -240,7 +237,10 @@
       dom: 'Bfrtip',
       "processing": true,
       "ajax": {
-        "url": url + "/defect"
+        "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&page="+pageId,
+        "dataSrc": function (d) {
+          return  d.data
+        }
       },
       "columns": [
         { "data": "Defect_Code" },

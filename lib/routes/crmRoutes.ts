@@ -30,7 +30,9 @@ export class Routes {
           sum_string += " and Response_Company/ID eq '" + response_company+"'";
         }
 
-        var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=100"
+        // var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=20"
+        var skiptoken = "&$skiptoken=" + pageId + "&$top=20"
+
         let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=Defect_Code,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company"
         url += "&$filter=" + sum_string+skiptoken;
         console.log(url)
@@ -53,7 +55,7 @@ export class Routes {
               headers: headers,
               json: true,
             }).then(response => {
-              // console.log(response);
+              console.log(response);
               res.status(200).send({
                 data: response.d.results
               })
@@ -67,10 +69,10 @@ export class Routes {
       .get((req: Request, res: Response) => {
         console.log(req.query);
         let url = "";
-        const req_list = req.query.dropdownlist;
-         const url_response_com = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_RESPONSE_COMPANY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq 6 ";
-        const url_project = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_PROJECT')/items?$select=ID,Title&$filter=ID eq 6 "
-            const url_defect_st = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_STATUS')/items?$select=ID,Title"
+         const req_list = req.query.dropdownlist;
+         const url_response_com = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_RESPONSE_COMPANY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '6'";
+         const url_project = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_PROJECT')/items?$select=ID,Title&$filter=ID eq 6 "
+         const url_defect_st = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_STATUS')/items?$select=ID,Title"
           if(req_list=="response_company"){
             url = url_response_com;
           }
