@@ -1,0 +1,380 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<style>
+  select {
+   border: 1px solid #ccc;
+   font-size: 16px;
+   height: 34px;
+   width: 268px;
+   margin-top: 10px;
+  }
+
+</style>
+<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+crossorigin="anonymous">
+<div align="center">
+  
+  <table class="display" style="width:100%">
+      <tr>
+        <td>
+          Project
+        </td>
+        <td>
+          <select id="project-dl">
+            <option value="0" disable>Please Select Project</option>
+          </select>
+        </td>
+        <td>
+          Status 
+        </td>
+        <td>
+          <select id="status-dl" required>
+            <option value="0" disable>Please Select Status</option>
+          </select> <br/>
+        </td>
+        <td>
+          Response Company
+        </td>
+        <td>
+          <select id="rp-comp-dl">
+            <option value="0" disable>Please Select Response Company</option>
+          </select><br/>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div>
+    
+    <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="queryReportByStatusRpCompProject()">Request Button</button>
+  </div>
+  <!-- <div id="global-num">0</div>
+  <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="previousQueryReport()">Request Previous</button>
+  <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="nextQueryReport()">Request Next</button> -->
+</div>
+
+
+<br/>
+<br/>
+<br/>
+<table id="example" class="display" style="width:100%">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Inspection / Date</th>
+        <th>Title / Description</th>
+        <th>Category / Sub-Category</th>
+        <th>Defect (Image)</th>
+        <th>Defect Area (Image) </th>
+        <th>Status</th>
+        <th>Response Company</th>
+        <th>Target Date</th>
+        <th>Correction (Image)</th>
+      </tr>
+    </thead>
+  </table>
+  
+  
+  </html>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+  <script src="http://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+  <!-- <script src=""></script><script src=""></script> -->
+  
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    
+    var url_dev = "http://localhost:3000";
+    var url_prod = "http://35.240.149.115:3000";
+    var trigger = 0;
+    var url = trigger===0?url_dev:url_prod;
+    $(document).ready(function () {
+      initDropDownlist();
+      
+      // $('#example').DataTable({
+        //   dom: 'Bfrtip',
+        //   buttons: [
+          //     'copy', 'csv', 'excel', 'print'
+          //   ],
+          //   "processing": true,
+          //   "ajax": {
+            //     "url": url+"/defect"
+            //   },
+            //   "columns": [
+              //     { "data": "Defect_Code" },
+    //     { "data": function (data, type, output) {
+    //         return data.Inspection.Title+" / "+ moment(data.Created).format('DD/MM/YYYY');
+    //       } 
+    //     },
+    //     { "data": function (data, type, output){
+    //         var description = "-";
+    //         if(data.Description) description = data.Description
+    //         return data.Title+" / "+ description;
+    //       }
+    //     },
+    //     { "data": function (data, type, output) {
+    //         return data.Category.Title + " / " + data.Sub_x002d_category.Title;
+    //       }
+    //     },
+    //     {
+    //       "data": "Defect_Image",
+    //       render: function (data, type, row) {
+    //         // console.log(data)
+    //         return '<img src="' + data + '" width="150px" height="150px">';
+    //       }
+    //     },
+    //     { "data": "Defect_Status.Title" },
+    //     { "data": "Response_Company.Title" },
+    //     { "data": function (data, type, row) {
+    //       var targetDate = moment(data.Target_Date).format('DD/MM/YYYY');
+    //         return " "+moment(data.Target_Date).format('DD/MM/YYYY');
+    //       }
+    //     },
+    //     {
+    //       "data": "Defect_Correction_IMG",
+    //       render: function (data, type, row) {
+    //         // console.log(data)
+    //         if(data) return '<img src="' + data + '" width="150px" height="150px">';
+    //         else  return  "ยังไม่แก้ไข" ;
+    //       }
+    //     },
+
+    //   ]
+    // });
+  });
+  function initDropDownlist() {
+     $.ajax({
+      'url': url+'/dropdownlist?dropdownlist=response_company',
+      dataType: 'json',
+      type: 'GET',
+      success: function (response) {
+        var result = response.data
+        for(var i=0;i<result.length;i+=1){
+         $('#rp-comp-dl').append('<option value="'+result[i].Id+'" disable>'+result[i].Title+'</option>');
+        }
+     
+        $.ajax({
+         'url': url + '/dropdownlist?dropdownlist=project',
+         dataType: 'json',
+         type: 'GET',
+         success: function (response) {
+           var result = response.data
+           for (var i = 0; i < result.length; i += 1) {
+             $('#project-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+           }
+           $.ajax({
+            'url': url + '/dropdownlist?dropdownlist=status',
+            dataType: 'json',
+            type: 'GET',
+            success: function (response) {
+              var result = response.data
+              for (var i = 0; i < result.length; i += 1) {
+                $('#status-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+              }
+            }
+          });
+         }
+       });
+      }
+    });
+  }
+
+  function queryReportByStatusRpCompProject() {
+    var selectedStatus = $("#status-dl").find(':selected').val();
+    var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
+    var selectedProject = $("#project-dl").find(':selected').val()
+    console.log($('#global-num').text())
+    
+    if(selectedProject!="0"){
+    $('#global-num').text(1);
+        renderDataTable(selectedRespCom, selectedProject, selectedStatus, 0);
+      }else {
+        // $("#status-dl").wrapInner("<p>Error Herer</p>")
+        alert("You have to choose select project")
+      }
+  }
+   function nextQueryReport() {
+     var urlNext = localStorage.getItem("next");
+     console.log(urlNext)
+     if(urlNext){
+       nextTable(urlNext);
+     }
+      // var selectedStatus = $("#status-dl").find(':selected').val();
+      // var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
+      // var selectedProject = $("#project-dl").find(':selected').val()
+      // var globalNum = parseInt($("#global-num").text())
+      // if (selectedProject != "0" && globalNum!=0) {
+      //   $('#global-num').text(globalNum + 1) 
+      //   renderDataTable(selectedRespCom, selectedProject, selectedStatus, globalNum);
+      // } else {
+      //   // $("#status-dl").wrapInner("<p>Error Herer</p>")
+      //   alert("You have to choose select project")
+      // }
+    }
+    function previousQueryReport(){
+       var selectedStatus = $("#status-dl").find(':selected').val();
+      var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
+      var selectedProject = $("#project-dl").find(':selected').val()
+      var globalNum = parseInt($("#global-num").text())
+      if (selectedProject != "0" && globalNum != 0) {
+        if(globalNum>1){
+          $('#global-num').text(globalNum - 1)
+          renderDataTable(selectedRespCom, selectedProject, selectedStatus, globalNum-2);
+        }
+      } else {
+          // $("#status-dl").wrapInner("<p>Error Herer</p>")
+        alert("You have to choose select project")
+      }
+    }
+    
+    // buttons: [
+    //   'copy', 'csv', 'excel', 'print'
+    // ],
+  function renderDataTable(response, project, status, pageId) {
+     $("#example").dataTable().fnDestroy()
+     $('#example').DataTable({
+      "pageLength": 20,
+      // dom: 'Bfrtip',
+      "order": [['1','asc']],
+      "processing": true,
+      "ajax": {
+        "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&page="+pageId,
+        "dataSrc": function (d) {
+          console.log(d)
+          localStorage.setItem('next', d.data.__next);
+          return  d.data.results
+        }
+      },
+      "columns": [
+        { "data": "Defect_Code" },
+        {
+          "data": function (data, type, output) {
+            return data.Inspection.Title + " / " +  "(" + moment(data.Created).format('DD/MM/YYYY') + ")";
+          }
+        },
+        {
+          "data": function (data, type, output) {
+            var description = "-";
+            if (data.Description) description = data.Description
+            return data.Title + " / " + description;
+          }
+        },
+        {
+          "data": function (data, type, output) {
+            return data.Category.Title + " / " + data.Sub_x002d_category.Title;
+          }
+        },
+        {
+          "data": "Defect_Image",
+          render: function (data, type, row) {
+            // console.log(data)
+            return '<img src="' + data + '" width="150px" height="150px">';
+          }
+        },
+        { "data": "Defect_Area_Image",
+          render: function (data, type, row) {
+            if (data) return '<img src="' + data + '" width="150px" height="150px">';
+            else return "N/A";
+          }
+        },
+        { "data": "Defect_Status.Title" },
+        { "data": "Response_Company.Title" },
+        {
+          "data": function (data, type, row) {
+            var targetDate = moment(data.Target_Date).format('DD/MM/YYYY');
+            return " " + moment(data.Target_Date).format('DD/MM/YYYY');
+          }
+        },
+        {
+          "data": "Defect_Correction_IMG",
+          render: function (data, type, row) {
+            // console.log(data)
+            if (data) return '<img src="' + data + '" width="150px" height="150px">';
+            else return "N/A";
+          }
+        },
+
+      ]
+    });
+  }
+      function nextTable(url) {
+        
+      
+        $("#example").dataTable().fnDestroy()
+        $('#example').DataTable({
+          dom: 'Bfrtip',
+          "processing": true,
+          "ajax": {
+            "url": url + "/next?url="+url,
+            "type": "GET",
+            "dataSrc": function (d) {
+              console.log(d)
+              localStorage.setItem('next', d.data.__next);
+              return d.data.results
+            }
+          },
+          "columns": [
+            { "data": "Defect_Code" },
+            {
+              "data": function (data, type, output) {
+                return data.Inspection.Title + " / " + "("+moment(data.Created).format('DD/MM/YYYY')+")";
+              }
+            },
+            {
+              "data": function (data, type, output) {
+                var description = "-";
+                if (data.Description) description = data.Description
+                return data.Title + " / " + description;
+              }
+            },
+            {
+              "data": function (data, type, output) {
+                return data.Category.Title + " / " + data.Sub_x002d_category.Title;
+              }
+            },
+            {
+              "data": "Defect_Image",
+              render: function (data, type, row) {
+                // console.log(data)
+                return '<img src="' + data + '" width="150px" height="150px">';
+              }
+            },
+            { "data": "Defect_Status.Title" },
+            { "data": "Response_Company.Title" },
+            {
+              "data": function (data, type, row) {
+                var targetDate = moment(data.Target_Date).format('DD/MM/YYYY');
+                return " " + moment(data.Target_Date).format('DD/MM/YYYY');
+              }
+            },
+            {
+              "data": "Defect_Correction_IMG",
+              render: function (data, type, row) {
+                // console.log(data)
+                if (data) return '<img src="' + data + '" width="150px" height="150px">';
+                else return "ยังไม่แก้ไข";
+              }
+            },
+
+          ]
+        });
+      }
+  // $.ajax({
+  //   'url': 'http://localhost:3000/defect',
+  //   dataType: 'json',
+  //   type: 'GET',
+  //   success: function (result) {
+  //     console.log(result)
+  //   }
+  // });
+
+</script>
