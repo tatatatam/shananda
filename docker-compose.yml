@@ -7,7 +7,7 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
 
-  front-sh-:
+  front-sh-1:
     image: nginx
     container_name: front-sh-v1
     ports:
