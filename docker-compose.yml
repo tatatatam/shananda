@@ -44,7 +44,7 @@ services:
   
   back-2:
     build: ./sh-2
-    image:  dev-ts:back
+    image:  dev-ts-2:back
     container_name: back-v2
     command: yarn run start
     ports:
