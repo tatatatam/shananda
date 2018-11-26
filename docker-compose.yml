@@ -14,7 +14,7 @@ services:
       - 8081:80
       - 3003:443
     links:
-      - back-1]
+      - back-1
     volumes:
       - ".:/usr/share/nginx/html"
     restart: always
