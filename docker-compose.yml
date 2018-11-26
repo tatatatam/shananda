@@ -7,40 +7,18 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
 
-  # front-sh:
-  #   image: nginx
-  #   container_name: front-sh-v1
-  #   ports:
-  #     - 8081:80
-  #     - 3001:443
-  #   links:
-  #     - back
-  #   volumes:
-  #     - ".:/usr/share/nginx/html"
-  #   restart: always
-  # back:
-  #   build: .
-  #   image:  dev-ts:back
-  #   container_name: back-v1
-  #   command: yarn run start
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - .:/app
-  #   restart: always
-   front-sh-2:
+  front-sh:
     image: nginx
     container_name: front-sh-v1
     ports:
       - 8081:80
-      - 3003:443
+      - 3001:443
     links:
       - back
     volumes:
       - ".:/usr/share/nginx/html"
     restart: always
-  
-  back-1:
+  back:
     build: .
     image:  dev-ts:back
     container_name: back-v1
@@ -48,29 +26,51 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./sh-1:/app
+      - .:/app
     restart: always
+  #  front-sh-2:
+  #   image: nginx
+  #   container_name: front-sh-v1
+  #   ports:
+  #     - 8081:80
+  #     - 3003:443
+  #   links:
+  #     - back
+  #   volumes:
+  #     - ".:/usr/share/nginx/html"
+  #   restart: always
   
-  front-sh-2:
-    image: nginx
-    container_name: front-sh-v2
-    ports:
-      - 8082:80
-      - 3004:443
-    links:
-      - back
-    volumes:
-      - "./sh-2:/usr/share/nginx/html"
-    restart: always
+  # back-1:
+  #   build: .
+  #   image:  dev-ts:back
+  #   container_name: back-v1
+  #   command: yarn run start
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./sh-1:/app
+  #   restart: always
   
-  back-2:
-    build: .
-    image:  dev-ts:back
-    container_name: back-v2
-    command: yarn run start
-    ports:
-      - 3001:3000
-    volumes:
-      - ./sh-2:/app
-    restart: always
+  # front-sh-2:
+  #   image: nginx
+  #   container_name: front-sh-v2
+  #   ports:
+  #     - 8082:80
+  #     - 3004:443
+  #   links:
+  #     - back
+  #   volumes:
+  #     - "./sh-2:/usr/share/nginx/html"
+  #   restart: always
+  
+  # back-2:
+  #   build: .
+  #   image:  dev-ts:back
+  #   container_name: back-v2
+  #   command: yarn run start
+  #   ports:
+  #     - 3001:3000
+  #   volumes:
+  #     - ./sh-2:/app
+  #   restart: always
     
