@@ -28,19 +28,19 @@ services:
   #   volumes:
   #     - .:/app
   #   restart: always
-   front-sh:
+   front-sh-2:
     image: nginx
     container_name: front-sh-v1
     ports:
       - 8081:80
-      - 3001:443
+      - 3003:443
     links:
       - back
     volumes:
       - ".:/usr/share/nginx/html"
     restart: always
   
-  back:
+  back-1:
     build: .
     image:  dev-ts:back
     container_name: back-v1
@@ -48,6 +48,29 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - .:/app
+      - ./sh-1:/app
+    restart: always
+  
+  front-sh-2:
+    image: nginx
+    container_name: front-sh-v2
+    ports:
+      - 8082:80
+      - 3004:443
+    links:
+      - back
+    volumes:
+      - "./sh-2:/usr/share/nginx/html"
+    restart: always
+  
+  back-2:
+    build: .
+    image:  dev-ts:back
+    container_name: back-v2
+    command: yarn run start
+    ports:
+      - 3001:3000
+    volumes:
+      - ./sh-2:/app
     restart: always
     
