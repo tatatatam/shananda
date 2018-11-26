@@ -14,13 +14,13 @@ services:
       - 8081:80
       - 3003:443
     links:
-      - back-1
+      - back-1]
     volumes:
       - ".:/usr/share/nginx/html"
     restart: always
   
   back-1:
-    build: .
+    build: ./sh-1
     image:  dev-ts:back
     container_name: back-v1
     command: yarn run start
@@ -43,7 +43,7 @@ services:
     restart: always
   
   back-2:
-    build: .
+    build: ./sh-2
     image:  dev-ts:back
     container_name: back-v2
     command: yarn run start
