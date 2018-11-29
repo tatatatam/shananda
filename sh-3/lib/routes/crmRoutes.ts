@@ -16,6 +16,29 @@ export class Routes {
           message: 'GET request successfulll!!!!'
         })
       })
+    app.route('/auth')
+      .post((req: Request, res: Response) => {
+        let username = req.body.username;
+        let password = req.body.password;
+        spauth
+          .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+          })
+          .then(data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+           res.status(200).json({data: "Authorized"})
+          
+          }).catch(err => {
+            res.status(401).json({data: "Cant login"});
+          })
+      })
+    
+  
     app.route('/next')
       .get((req: Request, res: Response) => {
         // const url = req.body.url;
@@ -66,7 +89,7 @@ export class Routes {
         // var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=20"
         // var skiptoken = "&$skiptoken=" + pageId 
 
-        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=ID,Defect_Code,Defect_Area_Image,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
+        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=ID,Defect_Code,Defect_Area_Image,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company"
         url += "&$filter=" + sum_string +"&$orderby=ID";
         // console.log(url)
         spauth
@@ -159,16 +182,46 @@ export class Routes {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
              
-            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=Defect_Code,Description,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company&$filter=Project/ID eq 6";
-            // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items"
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$select=Defect_Code,Description,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company&$filter=Project/ID eq 6";
             request.get({
               url: url,
               headers: headers,
               json: true,
             }).then(response => {
-              console.log(response);
+              // console.log(response);
+              
+             let data = response.d.results;
+             let counter_pass = 0;
+             let counter_not_pass = 0;
+
+            //  for( let i =0; i< data.length; i++ ){
+            //     if(data.Dfecte_Status.Title == "PASS") {
+            //       counter_pass++;
+            //     }else {
+            //       counter_not_pass++;
+            //     }
+            //  }
+            let res_count_status = {"PASS":0,"REMAIN":0};
+            let mapped_status = data.map(data => data.Defect_Status.Title);
+            for(let i=0;i<mapped_status.length;i++){
+              if(mapped_status[i]=="PASS") res_count_status["PASS"]++
+              else {
+                res_count_status["REMAIN"]++
+              }
+            }
+            let res_count = {};
+             let mapped = data.map(data => data.Response_Company.Title)
+             for(let i=0;i<mapped.length;i++){
+               res_count[mapped[i]] = 1+(res_count[mapped[i]]||0); 
+             }
+             
+              console.log(res_count);
+              console.log(res_count_status);
               res.status(200).send({
-                data: response.d.results
+                data: {
+                  passChart: res_count_status,
+                  responseCompanyChart: res_count
+                }
               })
             });
           }).catch(err=> {
@@ -184,26 +237,7 @@ export class Routes {
         })
       })
 
-    // Contact detail
-    app.route('/contact/:contactId')
-      // get specific contact
-      .get((req: Request, res: Response) => {
-        // Get a single contact detail            
-        res.status(200).send({
-          message: 'GET request successfulll!!!!'
-        })
-      })
-      .put((req: Request, res: Response) => {
-        // Update a contact           
-        res.status(200).send({
-          message: 'PUT request successfulll!!!!'
-        })
-      })
-      .delete((req: Request, res: Response) => {
-        // Delete a contact     
-        res.status(200).send({
-          message: 'DELETE request successfulll!!!!'
-        })
-      })
+  
+
   }
 }

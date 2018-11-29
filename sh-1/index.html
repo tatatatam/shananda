@@ -61,7 +61,7 @@ crossorigin="anonymous">
 <table id="example" class="display" style="width:100%">
     <thead>
       <tr>
-        <th>Code</th>
+        <th>Defect Id</th>
         <th>Inspection / Date</th>
         <th>Title / Description</th>
         <th>Category / Sub-Category</th>
@@ -255,7 +255,10 @@ crossorigin="anonymous">
         }
       },
       "columns": [
-        { "data": "Defect_Code" },
+        { "data": function (data, type, output) {
+            return "D-"+data.Defect_Info.ID;
+          }
+        },
         {
           "data": function (data, type, output) {
             return data.Inspection.Title + " / " +  "(" + moment(data.Created).format('DD/MM/YYYY') + ")";
@@ -263,7 +266,7 @@ crossorigin="anonymous">
         },
         {
           "data": function (data, type, output) {
-            var description = "-";
+            var description = "ไม่แสดงข้อมูล";
             if (data.Description) description = data.Description
             return data.Title + " / " + description;
           }
