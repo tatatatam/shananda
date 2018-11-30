@@ -28,8 +28,8 @@
     <div class="card-body" style="width: 30rem;   margin-left:auto; margin-right: auto; margin-top:auto; margin-bottom: auto;"
         class="tocenter">
        
-        <button class="btn btn-lg btn-primary btn-block" type="submit" onClick="">Defect List</button>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" onClick="">Statistic List</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" onClick="goDefect()">Defect List</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" onClick="goChart()">Statistic List</button>
     </div>
     <!-- </form> -->
 </body>
@@ -63,5 +63,13 @@
             alert("redirect");
         }
     }
+    function goDefect() {
+        window.location = "/defect"
+    }
+
+    function goChart() {
+        window.location = "/chart"
+    }
+
 
 </script>

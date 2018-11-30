@@ -20,6 +20,7 @@ export class Routes {
       .post((req: Request, res: Response) => {
         let username = req.body.username;
         let password = req.body.password;
+        console.log(username, password)
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
             username: username,
@@ -34,6 +35,7 @@ export class Routes {
            res.status(200).json({data: "Authorized"})
           
           }).catch(err => {
+            console.log(err);
             res.status(401).json({data: "Cant login"});
           })
       })
@@ -41,36 +43,7 @@ export class Routes {
   
     app.route('/next')
       .get((req: Request, res: Response) => {
-        // const url = req.body.url;
-        // console.log(req)
         res.end()
-        // spauth
-        //   .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
-        //     username: process.env.SH_USER,
-        //     password: process.env.SH_PASS
-        //   })
-        //   .then(data => {
-        //     var headers = data.headers;
-        //     headers['Accept'] = 'application/json;odata=verbose';
-        //     headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
-        //     headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
-        //     headers['honorCipherOrder'] = true;
-
-        //     // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items"
-
-        //     request.get({
-        //       url: url,
-        //       headers: headers,
-        //       json: true,
-        //     }).then(response => {
-        //       console.log(response);
-        //       res.status(200).send({
-        //         data: response.d
-        //       })
-        //     });
-        //   }).catch(err => {
-        //     console.log(err)
-        //   })
       })
     app.route('/filter')
       .get((req: Request, res: Response) => {
@@ -165,6 +138,40 @@ export class Routes {
           }).catch(err => {
             console.log(err)
           })
+      })
+
+      app.route("/grantlist")
+      .get((req:Request, res:Response) => {
+        const username = req.query.username;
+        const password = req.query.password;
+        console.log(username, password)
+        spauth
+          .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+          }).then( data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+            console.log(data)
+            res.end()
+            // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_USER_ROLE')/items?$select=Project/ID,Project/Title,User/Name&$expand=Project,User&$filter=substringof('"+username+"',User/Name)";
+            // request.get({
+            //   url: url,
+            //   headers: headers,
+            //   json: true,
+            // }).then(response => {
+            //   res.json(response);
+            // }).catch(err=>{
+            //   res.json(err);
+            // })
+          })
+          .catch(err=>{
+            res.json(err);
+          })
+
       })
     
     app.route('/defect')

@@ -1,6 +1,6 @@
 <html>
 <canvas id="passChart"></canvas>
-
+<canvas id="resChart"></canvas>
 
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
@@ -12,23 +12,47 @@
     });
     
     function chartInit(){
+$.ajax({
+    url: "http://localhost:3000/defect",
+        method: "GET",
+        success: function (data) {  
+            var label = [];
+            var meta = [];
+            var color = [];   
         var ctx = $("#passChart")
-        console.log(ctx);
+        var passChartData = data.data.passChart
+        
+        var resChartData = data.data.responseCompanyChart
+        var dynamicColors = function () {
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            return "rgb(" + r + "," + g + "," + b + ")";
+        };
+        var pCounter = 0;
+        for (const assoc in passChartData) {
+            pCounter+= passChartData[assoc];
+        }
+        console.log(pCounter);
+        for(const assoc in passChartData) {
+            label.push(assoc+" ("+(passChartData[assoc]/pCounter*100) +"% )");
+            meta.push(passChartData[assoc]);
+            color.push(dynamicColors());
+        }
+
+        
+    
         var myChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                labels: label,
+                options: {
+                    cutoutPercentage: "50"
+                },
                 datasets: [{
                     label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
+                    data: meta,
+                    backgroundColor: color,
                     borderColor: [
                         'rgba(255,99,132,1)',
                         'rgba(54, 162, 235, 1)',
@@ -50,5 +74,52 @@
                 }
             }
         });
+        label = [];
+        meta = [];
+        color = [];
+        var rCounter = 0;
+         for (const assoc in resChartData) {
+            rCounter+= resChartData[assoc];
+          }
+        for (const assoc in resChartData){
+             label.push(assoc + " (" + (resChartData[assoc] / rCounter * 100) + "% )");
+            meta.push(resChartData[assoc]);
+            color.push(dynamicColors());
+        }
+        console.log(meta)
+            var ctx2 = $("#resChart")
+
+            var myChart_2 = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: label,
+                    datasets: [{
+                        label: '# of Votes',
+                        data: meta,
+                        backgroundColor: color,
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+        
+    });
     }
 </script>
