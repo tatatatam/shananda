@@ -43,24 +43,13 @@
     $(document).ready(function () {
         unAuthChecker();
     });
-    function login() {
-        var email = $("#inputEmail").val();
-        var password = $("#inputPassword").val();
-        if (email && password) {
-            window.location = "/portal"
-            window.localStorage.setItem("username", email);
-            window.localStorage.setItem("password", password);
-        } else {
-            alert("Please insert value to form");
-        }
-    }
     function unAuthChecker() {
         var username = window.localStorage.getItem("username");
         var password = window.localStorage.getItem("password");
         if(username && password) {
             console.log(username, password);
         } else {
-            alert("redirect");
+             window.location = "/"
         }
     }
     function goDefect() {

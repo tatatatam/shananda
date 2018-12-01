@@ -1,20 +1,104 @@
 <html>
-<canvas id="passChart"></canvas>
-<canvas id="resChart"></canvas>
+<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous">
+    
+<body>
+    <div align="center">
+    <table class="display" style="width:100%">
+        <tr>
+            <td>
+                Project
+            </th>
+            <th>
+                <select id="project-dl" >
+                    <option value="0" disable>Please Select Project</option>
+                </select>
+            </td>
+            <td>
+                <button onclick="chartInit()">Request Button</button>
+            </td>
+        
+        </tr>
+    </table>
+</div>
+<table id="example" class="display" width="100%">
+    <thead>
+        <tr>
+            <th>Response</th>
+            <th>ทั้งหมด</th>
+            <th>แก้ไขแล้ว</th>
+            <th>คงเหลือ</th>
+        </tr>
+    </thead>
+    <tbody>
 
+    </tbody>
+</table>
+    <!-- <div class="chart-container" style="position: relative; height:40vh; width:80vw"> -->
+    <canvas id="passChart" width="400" height="100"></canvas>
+    <!-- </div> -->
+    
+    <canvas id="resChart" width="400" height="100"></canvas>
+    </body>
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 
 <script>
+    var url_dev = "http://localhost:3000";
+    var url_prod = "http://35.240.149.115:3001";
+    var trigger = 0;
+    var url = trigger === 0 ? url_dev : url_prod;
+    var username = window.localStorage.getItem("username");
+    var password = window.localStorage.getItem("password");
     $(document).ready(function () {
-        chartInit();
+        unAuthChecker();
+        initDropDownlist();
     });
+    function unAuthChecker() {
+        var username = window.localStorage.getItem("username");
+        var password = window.localStorage.getItem("password");
+        if (username && password) {
+            console.log(username, password);
+        } else {
+            window.location = "/"
+        }
+    }
+    function initDropDownlist() {
+            $.ajax({
+                'url': url + '/grantlist',
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    "username": username,
+                    "password": password,
+                },
+                success: function (response) {
+                    console.log(response)
+                    var result = response.d.results
+                    for (var i = 0; i < result.length; i += 1) {
+                        $('#project-dl').append('<option value="' + result[i].Project.ID + '" disable>' + result[i].Project.Title + '</option>');
+                    }
+                }
+            });
+    }
+
     
     function chartInit(){
-$.ajax({
-    url: "http://localhost:3000/defect",
-        method: "GET",
+        var selectedProject = $("#project-dl").find(':selected').val()
+        $.ajax({
+        url: "http://localhost:3000/defect",
+        method: "POST",
+        data:{
+            "username": username,
+            "password": password,
+            "project": selectedProject
+        },
         success: function (data) {  
             var label = [];
             var meta = [];
@@ -22,7 +106,8 @@ $.ajax({
         var ctx = $("#passChart")
         var passChartData = data.data.passChart
         
-        var resChartData = data.data.responseCompanyChart
+        var resChartData = data.data.responseCompanyRemain
+        renderTable(resChartData); 
         var dynamicColors = function () {
             var r = Math.floor(Math.random() * 255);
             var g = Math.floor(Math.random() * 255);
@@ -33,9 +118,8 @@ $.ajax({
         for (const assoc in passChartData) {
             pCounter+= passChartData[assoc];
         }
-        console.log(pCounter);
         for(const assoc in passChartData) {
-            label.push(assoc+" ("+(passChartData[assoc]/pCounter*100) +"% )");
+            label.push(assoc+" ("+ Math.round(passChartData[assoc]/pCounter*100) +"% )");
             meta.push(passChartData[assoc]);
             color.push(dynamicColors());
         }
@@ -79,11 +163,11 @@ $.ajax({
         color = [];
         var rCounter = 0;
          for (const assoc in resChartData) {
-            rCounter+= resChartData[assoc];
+            rCounter+= resChartData[assoc]["REMAIN"];
           }
         for (const assoc in resChartData){
-             label.push(assoc + " (" + (resChartData[assoc] / rCounter * 100) + "% )");
-            meta.push(resChartData[assoc]);
+             label.push(assoc + " (" + Math.round(resChartData[assoc]["REMAIN"] / rCounter * 100) + "% )");
+            meta.push(resChartData[assoc]["REMAIN"]);
             color.push(dynamicColors());
         }
         console.log(meta)
@@ -122,4 +206,37 @@ $.ajax({
         
     });
     }
+
+    function renderTable(data) {
+        var tableData = [];
+        var obj;
+        for (const assoc in data) {
+             obj = Object.assign({rp:assoc},data[assoc])
+            tableData.push(obj);
+        }
+        $("#example").dataTable().fnDestroy()
+        $('#example').DataTable({
+            data: tableData,
+            "columns": [
+                {
+                    "data": "rp",
+                     title: "Name"
+                },
+                {
+                    "data": function (data, type, output) {
+                        return data.PASS+data.REMAIN;
+                    },
+                     title: "Name"
+                },
+                {
+                    "data": "PASS",
+                     title: "Name"
+                },
+                {
+                    "data": "REMAIN",
+                     title: "Name"
+                }
+            ]
+        });
+    } 
 </script>

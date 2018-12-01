@@ -50,6 +50,8 @@ export class Routes {
         const response_company = req.query.response;
         const status = req.query.status;
         const project = req.query.project;
+        const username = req.query.username;
+        const password = req.query.password;
         const pageId = req.query.page;
         let sum_string = " Project/ID eq '" + project + "'";
         if (status!="0") {
@@ -62,13 +64,13 @@ export class Routes {
         // var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=20"
         // var skiptoken = "&$skiptoken=" + pageId 
 
-        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=ID,Defect_Code,Defect_Area_Image,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company"
+        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
         url += "&$filter=" + sum_string +"&$orderby=ID";
         // console.log(url)
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
-            username: process.env.SH_USER,
-            password: process.env.SH_PASS
+            username: username,
+            password: password
           })
           .then(data => {
             var headers = data.headers;
@@ -95,11 +97,14 @@ export class Routes {
       })
 
     app.route('/dropdownlist')
-      .get((req: Request, res: Response) => {
+      .post((req: Request, res: Response) => {
+        const username = req.body.username;
+        const password = req.body.password;
         console.log(req.query);
         let url = "";
-         const req_list = req.query.dropdownlist;
-         const url_response_com = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_RESPONSE_COMPANY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '12'";
+         const req_list = req.body.dropdownlist;
+         const project_id = req.body.project;
+         const url_response_com = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_RESPONSE_COMPANY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '"+project_id+"'";
          const url_project = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_PROJECT')/items?$select=ID,Title&$filter=ID eq 12 "
          const url_defect_st = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_STATUS')/items?$select=ID,Title"
           if(req_list=="response_company"){
@@ -113,8 +118,8 @@ export class Routes {
         // res.json(url);
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
-            username: process.env.SH_USER,
-            password: process.env.SH_PASS
+            username: username,
+            password: password
           })
           .then(data => {
             var headers = data.headers;
@@ -141,9 +146,9 @@ export class Routes {
       })
 
       app.route("/grantlist")
-      .get((req:Request, res:Response) => {
-        const username = req.query.username;
-        const password = req.query.password;
+      .post((req:Request, res:Response) => {
+        const username = req.body.username;
+        const password = req.body.password;
         console.log(username, password)
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
@@ -156,17 +161,16 @@ export class Routes {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
             console.log(data)
-            res.end()
-            // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_USER_ROLE')/items?$select=Project/ID,Project/Title,User/Name&$expand=Project,User&$filter=substringof('"+username+"',User/Name)";
-            // request.get({
-            //   url: url,
-            //   headers: headers,
-            //   json: true,
-            // }).then(response => {
-            //   res.json(response);
-            // }).catch(err=>{
-            //   res.json(err);
-            // })
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_USER_ROLE')/items?$select=Project/ID,Project/Title,User/Name&$expand=Project,User&$filter=substringof('"+username+"',User/Name)";
+            request.get({
+              url: url,
+              headers: headers,
+              json: true,
+            }).then(response => {
+              res.json(response);
+            }).catch(err=>{
+              res.json(err);
+            })
           })
           .catch(err=>{
             res.json(err);
@@ -176,12 +180,14 @@ export class Routes {
     
     app.route('/defect')
       // GET endpoint 
-      .get((req: Request, res: Response) => {
+      .post((req: Request, res: Response) => {
+        const username = req.body.username;
+        const password = req.body.password;
+        const project = req.body.project;
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
-            username: process.env.SH_USER,
-            password: process.env.SH_PASS
-          })
+            username: username,
+            password: password})
           .then(data => {
             var headers = data.headers;
             headers['Accept'] = 'application/json;odata=verbose';
@@ -189,7 +195,7 @@ export class Routes {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
              
-            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$select=Defect_Code,Description,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company&$filter=Project/ID eq 6";
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$select=Defect_Code,Description,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company&$filter=Project/ID eq "+project;
             request.get({
               url: url,
               headers: headers,
@@ -221,13 +227,39 @@ export class Routes {
              for(let i=0;i<mapped.length;i++){
                res_count[mapped[i]] = 1+(res_count[mapped[i]]||0); 
              }
+             var unique = mapped.filter((v, i, a) => a.indexOf(v) === i); 
+             let res_count2 = {};
+             let mapped_mx = data.map(data => {
+
+               return {"rp":data.Response_Company.Title, "status": data.Defect_Status.Title}
+               }
+             )
+             for(var i=0;i<unique.length;i++){
+               res_count2[unique[i]] = {PASS:0, REMAIN:0};
+              //  res_count2[unique[i]].REMAIN= 0;
+               for(var j=0;j<mapped_mx.length;j++){
+                  if(mapped_mx[j].rp == unique[i]){
+                    if (mapped_mx[j].status=="PASS"){
+                      res_count2[unique[i]].PASS++;
+                    } else {
+                      res_count2[unique[i]].REMAIN++;
+                    }
+                  }
+                }
+             }
+             console.log(res_count2)
+              // for (let i = 0; i < mapped_mx.length; i++) {
+                
+              //   res_count2[mapped_mx[i].rp] = 1 + (res_count2[mapped_mx[i]] || 0);
+              // }
              
               console.log(res_count);
               console.log(res_count_status);
               res.status(200).send({
                 data: {
                   passChart: res_count_status,
-                  responseCompanyChart: res_count
+                  responseCompanyChart: res_count,
+                  responseCompanyRemain: res_count2
                 }
               })
             });
@@ -237,14 +269,6 @@ export class Routes {
         // Get all contacts            
       })
       // POST endpoint
-      .post((req: Request, res: Response) => {
-        // Create new contact         
-        res.status(200).send({
-          message: 'POST request successfulll!!!!'
-        })
-      })
-
-  
-
-  }
+   
+    }
 }

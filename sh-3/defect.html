@@ -22,7 +22,7 @@ crossorigin="anonymous">
           Project
         </td>
         <td>
-          <select id="project-dl">
+          <select id="project-dl" onchange="changeRescomp()">
             <option value="0" disable>Please Select Project</option>
           </select>
         </td>
@@ -61,7 +61,7 @@ crossorigin="anonymous">
 <table id="example" class="display" style="width:100%">
     <thead>
       <tr>
-        <th>Code</th>
+        <th>Defect Id</th>
         <th>Inspection / Date</th>
         <th>Title / Description</th>
         <th>Category / Sub-Category</th>
@@ -95,17 +95,54 @@ crossorigin="anonymous">
     
     var url_dev = "http://localhost:3000";
     var url_prod = "http://35.240.149.115:3001";
-    var trigger = 1;
+    var trigger = 0;
     var url = trigger===0?url_dev:url_prod;
+    var username = window.localStorage.getItem("username");
+    var password = window.localStorage.getItem("password");
     $(document).ready(function () {
+      unAuthChecker();
       initDropDownlist();
     });
 
+      function unAuthChecker() {
+          var username = window.localStorage.getItem("username");
+          var password = window.localStorage.getItem("password");
+          if (username && password) {
+            console.log(username, password);
+          } else {
+            window.location = "/"
+          }
+        }
+
   function initDropDownlist() {
-    $.ajax({
-      'url': url + '/dropdownlist?dropdownlist=status',
+    
+  
+      $.ajax({
+      'url': url + '/grantlist',
       dataType: 'json',
-      type: 'GET',
+      type: 'POST',
+      data: {
+      "username": username,
+      "password": password,
+      },
+      success: function (response) {
+        var result = response.d.results
+        for (var i = 0; i < result.length; i += 1) {
+          $('#project-dl').append('<option value="' + result[i].Project.ID + '" disable>' + result[i].Project.Title + '</option>');
+        }
+      }
+    });
+    
+    
+    $.ajax({
+      'url': url + '/dropdownlist',
+      dataType: 'json',
+      type: 'POST',
+      data: {
+        "username": username,
+        "password": password,
+        "dropdownlist": "status",
+      },
       success: function (response) {
         var result = response.data
         for (var i = 0; i < result.length; i += 1) {
@@ -113,25 +150,27 @@ crossorigin="anonymous">
         }
       }
     });
-     $.ajax({
-      'url': url+'/dropdownlist?dropdownlist=response_company',
+
+    }
+    function changeRescomp(){
+      var selectedProject = $("#project-dl").find(':selected').val()
+      $.ajax({
+      'url': url+'/dropdownlist',
       dataType: 'json',
-      type: 'GET',
+      type: 'POST',
+      data: {
+        "username": username,
+        "password": password,
+        "dropdownlist": "response_company",
+        "project": selectedProject
+      },
       success: function (response) {
         var result = response.data
+        var data = $('#rp-comp-dl');
+        data.find("option").remove();
+        data.append('<option value="0" disable>Please Select Response Company</option>');
         for(var i=0;i<result.length;i+=1){
          $('#rp-comp-dl').append('<option value="'+result[i].Id+'" disable>'+result[i].Title+'</option>');
-        }
-      }
-    });
-    $.ajax({
-      'url': url + '/dropdownlist?dropdownlist=project',
-      dataType: 'json',
-      type: 'GET',
-      success: function (response) {
-        var result = response.data
-        for (var i = 0; i < result.length; i += 1) {
-          $('#project-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
         }
       }
     });
@@ -185,9 +224,7 @@ crossorigin="anonymous">
       }
     }
     
-    // buttons: [
-    //   'copy', 'csv', 'excel', 'print'
-    // ],
+  
   function renderDataTable(response, project, status, pageId) {
      $("#example").dataTable().fnDestroy()
      $('#example').DataTable({
@@ -196,7 +233,7 @@ crossorigin="anonymous">
       "order": [['1','asc']],
       "processing": true,
       "ajax": {
-        "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&page="+pageId,
+        "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&page="+pageId+"&username="+username+"&password="+password,
         "dataSrc": function (d) {
           console.log(d)
           localStorage.setItem('next', d.data.__next);
@@ -204,7 +241,11 @@ crossorigin="anonymous">
         }
       },
       "columns": [
-        { "data": "Defect_Code" },
+        {
+          "data": function (data, type, output) {
+            return "D-" + data.Defect_Info.ID;
+          }
+        },
         {
           "data": function (data, type, output) {
             return data.Inspection.Title + " / " +  "(" + moment(data.Created).format('DD/MM/YYYY') + ")";
@@ -212,7 +253,7 @@ crossorigin="anonymous">
         },
         {
           "data": function (data, type, output) {
-            var description = "-";
+            var description = "ไม่แสดงข้อมูล";
             if (data.Description) description = data.Description
             return data.Title + " / " + description;
           }
