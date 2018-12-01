@@ -14,7 +14,7 @@
             crossorigin="anonymous">
 
     <!-- Custom styles for this template -->
-    <link href="signin.css" rel="stylesheet">
+   
 </head>
 <style>
 .tocenter {
@@ -74,8 +74,9 @@
                 }
                 console.log(data);
             }).fail(function (data) {
+                // console.log(data)
                 // console.log(data);
-                alert(data.data ,"redirect homepage");
+                alert(data.statusText );
             })
             .always(function () {
                 // alert("finished");

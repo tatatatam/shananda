@@ -16,7 +16,7 @@
                 </select>
             </td>
             <td>
-                <button onclick="chartInit()">Request Button</button>
+                <button class="btn btn-primary btn-lg"  onclick="chartInit()">Request Button</button>
             </td>
         
         </tr>
@@ -34,11 +34,21 @@
     <tbody>
 
     </tbody>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th >Total:</th>
+            <th></th>
+        </tr>
+    </tfoot>
 </table>
     <!-- <div class="chart-container" style="position: relative; height:40vh; width:80vw"> -->
-    <canvas id="passChart" width="400" height="100"></canvas>
+<p class="text-center">แผนภูมิ Defect ทั้งโครงการ</p>
+    <canvas id="passChart" width="400" height="100">
+    </canvas>
     <!-- </div> -->
-    
+<p class="text-center">แผนภูมิ Defect คงเหลือตาม Response Company</p>
     <canvas id="resChart" width="400" height="100"></canvas>
     </body>
 </html>
@@ -131,7 +141,10 @@
             data: {
                 labels: label,
                 options: {
-                    cutoutPercentage: "50"
+                    title: {
+                        display: true,
+                        text: 'แผนภูมิ Defect ทั้งโครงการ'
+                    }
                 },
                 datasets: [{
                     label: '# of Votes',
@@ -216,27 +229,37 @@
         }
         $("#example").dataTable().fnDestroy()
         $('#example').DataTable({
+            "paging": false,
+            "bInfo": false,
             data: tableData,
             "columns": [
                 {
                     "data": "rp",
-                     title: "Name"
+                     title: "Response Company"
                 },
                 {
                     "data": function (data, type, output) {
                         return data.PASS+data.REMAIN;
                     },
-                     title: "Name"
+                     title: "ทั้งหมด"
                 },
                 {
                     "data": "PASS",
-                     title: "Name"
+                     title: "แก้ไขแล้ว"
                 },
                 {
                     "data": "REMAIN",
-                     title: "Name"
+                     title: "คงเหลือ"
                 }
-            ]
+            ],
+            "footerCallback": function (row, data, start, end, display) {
+               var api = this.api();
+                $(api.column(3).footer()).html(
+                    api.column(3).data().reduce(function (a, b) {
+                        return a + b;
+                    }, 0)
+                );
+            }
         });
     } 
 </script>
