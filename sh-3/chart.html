@@ -104,7 +104,7 @@
     function chartInit(){
         var selectedProject = $("#project-dl").find(':selected').val()
         $.ajax({
-        url: "http://localhost:3000/defect",
+        url: url+"/defect",
         method: "POST",
         data:{
             "username": username,
