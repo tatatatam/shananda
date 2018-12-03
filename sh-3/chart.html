@@ -18,7 +18,7 @@
                 </select>
             </td>
             <td>
-                <button class="btn btn-primary btn-lg"  onclick="chartInit()">Request Button</button>
+                <button class="btn btn-primary "  onclick="chartInit()">HandOver Summary</button>
             </td>
         
         </tr>
@@ -46,12 +46,32 @@
     </tfoot>
 </table>
     <!-- <div class="chart-container" style="position: relative; height:40vh; width:80vw"> -->
-<p class="text-center">แผนภูมิ Defect ทั้งโครงการ</p>
-    <canvas id="passChart" width="400" height="100">
-    </canvas>
-    <!-- </div> -->
-<p class="text-center">แผนภูมิ Defect คงเหลือตาม Response Company</p>
-    <canvas id="resChart" width="400" height="100"></canvas>
+<div class="row">
+    <div class="col-6">
+       <p class="text-center">แผนภูมิ Defect ทั้งโครงการ</p>
+       <canvas id="passChart" width="400" height="100">
+       </canvas>
+   </div>
+   <div  class="col-6">
+        <p class="text-center">แผนภูมิ Defect คงเหลือตาม Response Company</p>
+        <canvas id="resChart" width="400" height="100"></canvas>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <p class="text-center">แผนภูมิ การรับมอบพื้นที่ ทั้งโครงการ</p>
+        <canvas id="cateChart" width="400" height="100">
+        </canvas>
+    </div>
+    <div class="col-6">
+        <p class="text-center">แผนภูมิ การรับมอบเอกสาร ทั้งโครงการล</p>
+        <canvas id="docChart" width="400" height="100"></canvas>
+
+    </div>
+</div>
+<!-- </div> -->
     </body>
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
@@ -64,7 +84,7 @@
 <script>
     var url_dev = "http://localhost:3000";
     var url_prod = "http://35.240.149.115:3002";
-    var trigger = 1;
+    var trigger = 0;
     var url = trigger === 0 ? url_dev : url_prod;
     var username = window.localStorage.getItem("username");
     var password = window.localStorage.getItem("password");
@@ -136,22 +156,29 @@
             color.push(dynamicColors());
         }
 
-        
-    
+      
         var myChart = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: label,
                 options: {
-                    title: {
-                        display: true,
-                        text: 'แผนภูมิ Defect ทั้งโครงการ'
+                      scales: {
+                        xAxes: [{
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        yAxes: [{
+                            gridLines: {
+                                display: false
+                            }
+                        }]
                     }
                 },
                 datasets: [{
                     label: '# of Votes',
                     data: meta,
-                    backgroundColor: color,
+                    backgroundColor: ['rgba(0,121,187,1)', 'rgba(250,90,20,1)'],
                     borderColor: [
                         'rgba(255,99,132,1)',
                         'rgba(54, 162, 235, 1)',
@@ -163,16 +190,9 @@
                     borderWidth: 1
                 }]
             },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
+           
         });
+        // myChart.defaults.scale.gridLines.display = false;
         label = [];
         meta = [];
         color = [];
@@ -192,6 +212,20 @@
                 type: 'pie',
                 data: {
                     labels: label,
+                    options: {
+                        scales: {
+                            xAxes: [{
+                                gridLines: {
+                                    display: false
+                                }
+                            }],
+                            yAxes: [{
+                                gridLines: {
+                                    display: false
+                                }
+                            }]
+                        }
+                    },
                     datasets: [{
                         label: '# of Votes',
                         data: meta,
@@ -206,20 +240,14 @@
                         ],
                         borderWidth: 1
                     }]
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    }
                 }
+           
             });
         }
         
     });
+    approveDoc();
+    approveDoc2();
     }
 
     function renderTable(data) {
@@ -263,5 +291,156 @@
                 );
             }
         });
-    } 
+        
+    }
+    // approveDoc();
+    function approveDoc (){
+        var selectedProject = $("#project-dl").find(':selected').val()
+        // var selectedProject = 8 //hardcode;
+        $.ajax({
+            url: url + "/category",
+            method: "POST",
+            data: {
+                "username": username,
+                "password": password,
+                "project": selectedProject
+            },
+            success: function (data) {  
+                console.log(data)
+                    var label = [];
+                var meta = [];
+                var color = [];
+                var ctx = $("#cateChart")
+                var cateChartData = data.data.category_approve
+
+                var dynamicColors = function () {
+                    var r = Math.floor(Math.random() * 255);
+                    var g = Math.floor(Math.random() * 255);
+                    var b = Math.floor(Math.random() * 255);
+                    return "rgb(" + r + "," + g + "," + b + ")";
+                };
+                var pCounter = 0;
+                for (const assoc in cateChartData) {
+                    pCounter += cateChartData[assoc];
+                }
+                for (const assoc in cateChartData) {
+                    label.push(assoc + " (" + Math.round(cateChartData[assoc] / pCounter * 100) + "% )");
+                    meta.push(cateChartData[assoc]);
+                    color.push(dynamicColors());
+                }
+
+
+                var cateChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: label,
+                        options: {
+                            scales: {
+                                xAxes: [{
+                                    gridLines: {
+                                        display: false
+                                    }
+                                }],
+                                yAxes: [{
+                                    gridLines: {
+                                        display: false
+                                    }
+                                }]
+                            }
+                        },
+                        datasets: [{
+                            label: '# of Votes',
+                            data: meta,
+                            backgroundColor: ['rgba(0,121,187,1)', 'rgba(250,90,20,1)'],
+                            borderColor: [
+                                'rgba(255,99,132,1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+
+                });
+            }
+        });
+    }
+
+     function approveDoc2() {
+            var selectedProject = $("#project-dl").find(':selected').val()
+            // var selectedProject = 8 //hardcode;
+            $.ajax({
+                url: url + "/document",
+                method: "POST",
+                data: {
+                    "username": username,
+                    "password": password,
+                    "project": selectedProject
+                },
+                success: function (data) {
+                    console.log(data)
+                    var label = [];
+                    var meta = [];
+                    var color = [];
+                    var ctx = $("#docChart")
+                    var cateChartData = data.data.category_approve
+
+                    var dynamicColors = function () {
+                        var r = Math.floor(Math.random() * 255);
+                        var g = Math.floor(Math.random() * 255);
+                        var b = Math.floor(Math.random() * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    };
+                    var pCounter = 0;
+                    for (const assoc in cateChartData) {
+                        pCounter += cateChartData[assoc];
+                    }
+                    for (const assoc in cateChartData) {
+                        label.push(assoc + " (" + Math.round(cateChartData[assoc] / pCounter * 100) + "% )");
+                        meta.push(cateChartData[assoc]);
+                        color.push(dynamicColors());
+                    }
+
+
+                    var docChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: label,
+                            options: {
+                                scales: {
+                                    xAxes: [{
+                                        gridLines: {
+                                            display: false
+                                        }
+                                    }],
+                                    yAxes: [{
+                                        gridLines: {
+                                            display: false
+                                        }
+                                    }]
+                                }
+                            },
+                            datasets: [{
+                                label: '# of Votes',
+                                data: meta,
+                                backgroundColor: ['rgba(0,121,187,1)', 'rgba(250,90,20,1)'],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+
+                    });
+                }
+            });
+        }
 </script>

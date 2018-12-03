@@ -64,7 +64,7 @@ export class Routes {
         // var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=20"
         // var skiptoken = "&$skiptoken=" + pageId 
 
-        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
+        let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$top=2000&$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
         url += "&$filter=" + sum_string +"&$orderby=ID";
         // console.log(url)
         spauth
@@ -161,7 +161,7 @@ export class Routes {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
             console.log(data)
-            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_USER_ROLE')/items?$select=Project/ID,Project/Title,User/Name&$expand=Project,User&$filter=substringof('"+username+"',User/Name)";
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_USER_ROLE')/items?$top=2000&$select=Project/ID,Project/Title,User/Name&$expand=Project,User&$filter=substringof('"+username+"',User/Name)";
             request.get({
               url: url,
               headers: headers,
@@ -195,7 +195,7 @@ export class Routes {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
              
-            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$select=Defect_Code,Description,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company&$filter=Project/ID eq "+project;
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$top=2000&$select=Defect_Code,Description,Title,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company&$filter=Project/ID eq "+project;
             request.get({
               url: url,
               headers: headers,
@@ -268,7 +268,104 @@ export class Routes {
           })
         // Get all contacts            
       })
-      // POST endpoint
+     
+    app.route('/category')
+      // GET endpoint 
+      .post((req: Request, res: Response) => {
+        const username = req.body.username;
+        const password = req.body.password;
+        const project = req.body.project;
+        spauth
+          .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+          })
+          .then(data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$top=2000&$select=Title,Project/ID,Project/Title,Is_Approved&$expand=Project&$filter=Project/ID eq " + project;
+            request.get({
+              url: url,
+              headers: headers,
+              json: true,
+            }).then(response => {
+              // console.log(response);
+
+              let data = response.d.results;
+              let counter = {APPROVE:0, NON_APPROVE:0}
+              for(let i=0;i<data.length;i++){
+                if (data.Is_Approved){
+                  counter.APPROVE++;
+                } else {
+                  counter.NON_APPROVE++;
+                }
+              }
+              console.log(data);
+              res.status(200).send({
+                data: {
+                 dt: data,
+                 category_approve: counter
+                }
+              })
+            });
+          }).catch(err => {
+            console.log(err)
+          })
+        // Get all contacts            
+      })
+
+    app.route('/document')
+      // GET endpoint 
+      .post((req: Request, res: Response) => {
+        const username = req.body.username;
+        const password = req.body.password;
+        const project = req.body.project;
+        spauth
+          .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+          })
+          .then(data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DOCUMENT')/items?$top=2000&$select=Title,Project/ID,Project/Title,Is_Approved&$expand=Project&$filter=Project/ID eq " + project;
+            request.get({
+              url: url,
+              headers: headers,
+              json: true,
+            }).then(response => {
+              // console.log(response);
+
+              let data = response.d.results;
+              let counter = { APPROVE: 0, NON_APPROVE: 0 }
+              for (let i = 0; i < data.length; i++) {
+                if (data.Is_Approved) {
+                  counter.APPROVE++;
+                } else {
+                  counter.NON_APPROVE++;
+                }
+              }
+              console.log(data);
+              res.status(200).send({
+                data: {
+                  dt: data,
+                  doc_approve: counter
+                }
+              })
+            });
+          }).catch(err => {
+            console.log(err)
+          })
+        // Get all contacts            
+      })
    
     }
 }
