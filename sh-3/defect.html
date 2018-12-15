@@ -42,6 +42,14 @@ crossorigin="anonymous">
             <option value="0" disable>Please Select Response Company</option>
           </select><br/>
         </td>
+        <td>
+          Category
+        </td>
+        <td>
+          <select id="rp-ct-dl">
+            <option value="0" disable>Please Select Category</option>
+          </select><br />
+        </td>
       </tr>
     </table>
   </div>
@@ -174,17 +182,43 @@ crossorigin="anonymous">
         }
       }
     });
+    //support change cate
+    changeCategory();
     }
+     function changeCategory() {
+        var selectedProject = $("#project-dl").find(':selected').val()
+        $.ajax({
+          'url': url + '/dropdownlist',
+          dataType: 'json',
+          type: 'POST',
+          data: {
+            "username": username,
+            "password": password,
+            "dropdownlist": "category",
+            "project": selectedProject
+          },
+          success: function (response) {
+            var result = response.data
+            var data = $('#rp-ct-dl');
+            data.find("option").remove();
+            data.append('<option value="0" disable>Please Select Category</option>');
+            for (var i = 0; i < result.length; i += 1) {
+              $('#rp-ct-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+            }
+          }
+        });
+      }
 
   function queryReportByStatusRpCompProject() {
     var selectedStatus = $("#status-dl").find(':selected').val();
     var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
     var selectedProject = $("#project-dl").find(':selected').val()
+    var selectedCategory = $("#rp-ct-dl").find(':selected').val()
     console.log($('#global-num').text())
     
     if(selectedProject!="0"){
     $('#global-num').text(1);
-        renderDataTable(selectedRespCom, selectedProject, selectedStatus, 0);
+        renderDataTable(selectedRespCom, selectedProject, selectedStatus, selectedCategory, 0);
       }else {
         // $("#status-dl").wrapInner("<p>Error Herer</p>")
         alert("You have to choose select project")
@@ -208,24 +242,24 @@ crossorigin="anonymous">
       //   alert("You have to choose select project")
       // }
     }
-    function previousQueryReport(){
-       var selectedStatus = $("#status-dl").find(':selected').val();
-      var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
-      var selectedProject = $("#project-dl").find(':selected').val()
-      var globalNum = parseInt($("#global-num").text())
-      if (selectedProject != "0" && globalNum != 0) {
-        if(globalNum>1){
-          $('#global-num').text(globalNum - 1)
-          renderDataTable(selectedRespCom, selectedProject, selectedStatus, globalNum-2);
-        }
-      } else {
-          // $("#status-dl").wrapInner("<p>Error Herer</p>")
-        alert("You have to choose select project")
-      }
-    }
+    // function previousQueryReport(){
+    //    var selectedStatus = $("#status-dl").find(':selected').val();
+    //   var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
+    //   var selectedProject = $("#project-dl").find(':selected').val()
+    //   var globalNum = parseInt($("#global-num").text())
+    //   if (selectedProject != "0" && globalNum != 0) {
+    //     if(globalNum>1){
+    //       $('#global-num').text(globalNum - 1)
+    //       renderDataTable(selectedRespCom, selectedProject, selectedStatus, globalNum-2);
+    //     }
+    //   } else {
+    //       // $("#status-dl").wrapInner("<p>Error Herer</p>")
+    //     alert("You have to choose select project")
+    //   }
+    // }
     
   
-  function renderDataTable(response, project, status, pageId) {
+  function renderDataTable(response, project, status, category, pageId) {
      $("#example").dataTable().fnDestroy()
      $('#example').DataTable({
       "pageLength": 20,
@@ -233,7 +267,7 @@ crossorigin="anonymous">
       "order": [['1','asc']],
       "processing": true,
       "ajax": {
-        "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&page="+pageId+"&username="+username+"&password="+password,
+        "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&category="+category+"&page="+pageId+"&username="+username+"&password="+password,
         "dataSrc": function (d) {
           console.log(d)
           localStorage.setItem('next', d.data.__next);
