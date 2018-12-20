@@ -48,6 +48,7 @@ export class Routes {
     app.route('/filter')
       .get((req: Request, res: Response) => {
         const response_company = req.query.response;
+        const category = req.query.category;
         const status = req.query.status;
         const project = req.query.project;
         const username = req.query.username;
@@ -61,12 +62,16 @@ export class Routes {
           sum_string += " and Response_Company/ID eq '" + response_company+"'";
         }
 
+        if(category!="0"){
+          sum_string += " and Category/ID eq '" + category+"'";
+        }
+
         // var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=20"
         // var skiptoken = "&$skiptoken=" + pageId 
 
         let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$top=2000&$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
         url += "&$filter=" + sum_string +"&$orderby=ID";
-        // console.log(url)
+        console.log(url)
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
             username: username,
@@ -107,12 +112,17 @@ export class Routes {
          const url_response_com = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_RESPONSE_COMPANY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '"+project_id+"'";
          const url_project = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_PROJECT')/items?$select=ID,Title&$filter=ID eq 12 "
          const url_defect_st = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_STATUS')/items?$select=ID,Title"
-          if(req_list=="response_company"){
+         const url_cate = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "'";
+         if(req_list=="response_company"){
             url = url_response_com;
           }
           else if(req_list=="project"){
             url = url_project;
-          } else {
+          }
+          else if(req_list=="category"){
+            url = url_cate;
+          }
+          else {
             url = url_defect_st;
           }
         // res.json(url);
@@ -129,7 +139,7 @@ export class Routes {
             headers['honorCipherOrder'] = true;
 
             // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items"
-            
+            console.log(url);
             request.get({
               url: url,
               headers: headers,
