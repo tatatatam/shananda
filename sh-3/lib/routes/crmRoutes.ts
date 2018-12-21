@@ -9,13 +9,15 @@ dotenv.config()
 export class Routes {
 
   public routes(app): void {
-
+    
     app.route('/')
-      .get((req: Request, res: Response) => {
-        res.status(200).send({
-          message: 'GET request successfulll!!!!'
-        })
-      })
+      .get( 
+        (req: Request, res: Response) => {
+          res.status(200).send({
+            message: 'GET request successfulll!!!!'
+          })
+        }
+      )
     app.route('/auth')
       .post((req: Request, res: Response) => {
         let username = req.body.username;
@@ -70,9 +72,6 @@ export class Routes {
         if(subcategory!="0"){
           sum_string += " and Sub_x002d_category/ID eq '" + subcategory + "'";
         }
-        // var skiptoken = "&$skiptoken=Paged=TRUE&p_ID="+pageId+"&$top=20"
-        // var skiptoken = "&$skiptoken=" + pageId 
-
         let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$top=2000&$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
         url += "&$filter=" + sum_string +"&$orderby=ID";
         console.log(url)
@@ -87,9 +86,6 @@ export class Routes {
             headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
-
-            // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items"
-
             request.get({
               url: url,
               headers: headers,
@@ -133,7 +129,6 @@ export class Routes {
           else {
             url = url_defect_st;
           }
-        // res.json(url);
         spauth
           .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
             username: username,
@@ -145,8 +140,6 @@ export class Routes {
             headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
-
-            // const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items"
             console.log(url);
             request.get({
               url: url,
@@ -224,14 +217,6 @@ export class Routes {
              let data = response.d.results;
              let counter_pass = 0;
              let counter_not_pass = 0;
-
-            //  for( let i =0; i< data.length; i++ ){
-            //     if(data.Dfecte_Status.Title == "PASS") {
-            //       counter_pass++;
-            //     }else {
-            //       counter_not_pass++;
-            //     }
-            //  }
             let res_count_status = {"PASS":0,"REMAIN":0};
             let mapped_status = data.map(data => data.Defect_Status.Title);
             for(let i=0;i<mapped_status.length;i++){
@@ -265,14 +250,6 @@ export class Routes {
                   }
                 }
              }
-             console.log(res_count2)
-              // for (let i = 0; i < mapped_mx.length; i++) {
-                
-              //   res_count2[mapped_mx[i].rp] = 1 + (res_count2[mapped_mx[i]] || 0);
-              // }
-             
-              console.log(res_count);
-              console.log(res_count_status);
               res.status(200).send({
                 data: {
                   passChart: res_count_status,
