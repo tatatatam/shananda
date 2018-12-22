@@ -65,7 +65,6 @@ export const evidencelsit = (req: Request, res: Response) => {
   if (assessment_id != 0) sumString += " and Assmnt_Type/ID eq "+assessment_id
   // if(url)
   url+= sumString
-  console.log(url)
   spauth
     .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
       username: username,
@@ -77,7 +76,6 @@ export const evidencelsit = (req: Request, res: Response) => {
       headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
       headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
       headers['honorCipherOrder'] = true;
-      console.log(url);
       request.get({
         url: url,
         headers: headers,
