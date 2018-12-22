@@ -58,7 +58,7 @@ export const evidencelsit = (req: Request, res: Response) => {
   const project_id = req.query.project;
   const audit_id = req.query.audit;
   const assessment_id = req.query.assessment;
-  url = "https://ananda365.sharepoint.com/sites/SmartQualityAssurance/_api/lists/getbytitle('SQA_AUDIT_EVIDENCE')/items?$select=Title,Project/Title,Audit/Title,Assmnt_Type/Title,Assmnt_Category/Title,Assmnt_Subcategory/Title,Assmnt_Topic/Title,Created,Author/Title,Evidence_Image&$expand=Project,Audit,Assmnt_Type,Assmnt_Category,Assmnt_Subcategory,Assmnt_Topic,Author&$filter="
+  url = "https://ananda365.sharepoint.com/sites/SmartQualityAssurance/_api/lists/getbytitle('SQA_AUDIT_EVIDENCE')/items?$top=2000&$select=Title,Project/Title,Audit/Title,Assmnt_Type/Title,Assmnt_Category/Title,Assmnt_Subcategory/Title,Assmnt_Topic/Title,Created,Author/Title,Evidence_Image&$expand=Project,Audit,Assmnt_Type,Assmnt_Category,Assmnt_Subcategory,Assmnt_Topic,Author&$filter="
   let sumString = "";
   if (project_id != 0) sumString += " Project/ID eq "+project_id;
   if (audit_id != 0) sumString += " and Audit/ID eq "+audit_id;

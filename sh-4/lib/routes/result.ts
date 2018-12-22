@@ -59,7 +59,7 @@ export const resultList = (req: Request, res: Response) => {
   const project_id = req.query.project;
   const audit_id = req.query.audit;
   const assessment_id = req.query.assessment;
-  url = "https://ananda365.sharepoint.com/sites/SmartQualityAssurance/_api/lists/getbytitle('SQA_AUDIT_RESULT')/items?$select=Title,Project/Title,Audit/Title,Assmnt_Type/Title,Assmnt_Category/Title,Assmnt_Subcategory/Title,Assmnt_Topic/Title,Created,Author/Title,Weight,Point,Score,Remarks&$expand=Project,Audit,Assmnt_Type,Assmnt_Category,Assmnt_Subcategory,Assmnt_Topic,Author&$filter="
+  url = "https://ananda365.sharepoint.com/sites/SmartQualityAssurance/_api/lists/getbytitle('SQA_AUDIT_RESULT')/items?$top=2000&$select=Title,Project/Title,Audit/Title,Assmnt_Type/Title,Assmnt_Category/Title,Assmnt_Subcategory/Title,Assmnt_Topic/Title,Created,Author/Title,Weight,Point,Score,Remarks&$expand=Project,Audit,Assmnt_Type,Assmnt_Category,Assmnt_Subcategory,Assmnt_Topic,Author&$filter="
   let sumString = "";
   if (project_id != 0) sumString += " Project/ID eq " + project_id;
   if (audit_id != 0) sumString += " and Audit/ID eq " + audit_id;
@@ -119,7 +119,6 @@ export const resultList = (req: Request, res: Response) => {
             spliter_arr[dt][sub] = group_arr[dt][sub][i].Score + (spliter_arr[dt][sub]||0)
           }
         }
-        console.log(spliter_arr)
         for( var i=0 ;i<data.length;i++){
           data[i]["Score_Cat"] = spliter[data[i].Assmnt_Category.Title]
           data[i]["Score_Subcat"] = spliter_arr[data[i].Assmnt_Category.Title][data[i].Assmnt_Subcategory.Title]
