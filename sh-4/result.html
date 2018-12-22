@@ -1,0 +1,268 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<style>
+  select {
+    border: 1px solid #ccc;
+    font-size: 16px;
+    height: 34px;
+    width: 268px;
+    margin-top: 10px;
+  }
+</style>
+<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous">
+
+<body>
+  <div class="containter" style="width: 100%;" align="center">
+
+    <table class="display" style="width:100%">
+      <tr>
+        <td>
+          Project
+        </td>
+        <td>
+          <select id="project-dl" onchange="changeAudit()">
+            <option value="0" disable>Please Select Project</option>
+          </select>
+        </td>
+        <td>
+          Audit
+        </td>
+        <td>
+          <select id="audit-dl" onChange="changeAssessment()" required>
+            <option value="0" disable>Please Select Audit</option>
+          </select> <br />
+        </td>
+        <td>
+          Assessment Type
+        </td>
+        <td>
+          <select id="rp-at-dl">
+            <option value="0" disable>Please Select Assessment</option>
+          </select><br />
+        </td>
+      </tr>
+    </table>
+  </div>
+  <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;margin-bottom:10px;" onclick="queryReport()">Request
+    Button</button>
+  <div>
+    <table id="example" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>Category (Assmnt_Category)</th>
+          <th>Score Category</th>
+          <th>Sub-category (Assmnt_Subcategory)</th>
+          <th>Score Category</th>
+          <th>Topic (Assmnt_Topic)</th>
+          <th>Remarks</th>
+          <th>Evidence (Evidence_Image)</th>
+          <th>Created / By (Author)</th>
+        </tr>
+      </thead>
+    </table>
+
+</body>
+
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+<script src="http://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.0.4/js/dataTables.rowGroup.min.js"></script>
+<script src="plugin/dataTables.rowsGroup.js"></script>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+
+  var url_dev = "http://localhost:3000";
+  var url_prod = "http://35.240.149.115:3002";
+  var trigger = 1;
+  if (location.hostname == "localhost") trigger = 0;
+  var url = trigger === 0 ? url_dev : url_prod;
+  console.log(url)
+  var username = window.localStorage.getItem("username");
+  var password = window.localStorage.getItem("password");
+  $(document).ready(function () {
+    unAuthChecker();
+    initDropdownlist();
+
+  });
+
+  function unAuthChecker() {
+    var username = window.localStorage.getItem("username");
+    var password = window.localStorage.getItem("password");
+    if (username && password) {
+      console.log(username, password);
+    } else {
+      window.location = "/"
+    }
+  }
+
+  function initDropdownlist() {
+    var selectedProject = $("#project-dl").find(':selected').val()
+    $.ajax({
+      'url': url + '/evidence/dropdownlist',
+      dataType: 'json',
+      type: 'POST',
+      data: {
+        "username": username,
+        "password": password,
+        "dropdownlist": "project"
+      },
+      success: function (response) {
+        console.log(response)
+        var result = response.data
+        var data = $('#project-dl');
+        data.find("option").remove();
+        data.append('<option value="0" disable>Please Select Project</option>');
+
+        for (var i = 0; i < result.length; i += 1) {
+          $('#project-dl').append('<option value="' + result[i].ID + '" disable>' + result[i].Title + '</option>');
+        }
+      }
+    });
+  }
+
+  function changeAudit() {
+    var selectedProject = $("#project-dl").find(':selected').val()
+    $.ajax({
+      'url': url + '/evidence/dropdownlist',
+      dataType: 'json',
+      type: 'POST',
+      data: {
+        "username": username,
+        "password": password,
+        "dropdownlist": "audit",
+        "project": selectedProject
+      },
+      success: function (response) {
+        console.log(response)
+        var result = response.data
+        var data = $('#audit-dl');
+        data.find("option").remove();
+        data.append('<option value="0" disable>Please Select Audit</option>');
+        for (var i = 0; i < result.length; i += 1) {
+          $('#audit-dl').append('<option ass_value="' + result[i].Assmnt_Set.ID + '" value="' + result[i].ID + '" disable>' + result[i].Title + '</option>');
+        }
+      }
+    });
+  }
+
+  function changeAssessment() {
+    var selectedAudit = $("#audit-dl").find(':selected').attr("ass_value")
+    console.log(selectedAudit)
+    $.ajax({
+      'url': url + '/result/dropdownlist',
+      dataType: 'json',
+      type: 'POST',
+      data: {
+        "username": username,
+        "password": password,
+        "dropdownlist": "assessment",
+        "assessment": selectedAudit
+      },
+      success: function (response) {
+        console.log(response)
+        var result = response.data
+        var data = $('#rp-at-dl');
+        data.find("option").remove();
+        data.append('<option value="0" disable>Please Select Assessment</option>');
+        for (var i = 0; i < result.length; i += 1) {
+          $('#rp-at-dl').append('<option  value="' + result[i].ID + '" disable>' + result[i].Title + '</option>');
+        }
+      }
+    });
+  }
+
+  function queryReport() {
+    var selectedProject = $("#project-dl").find(':selected').val()
+    var selectedAudit = $("#audit-dl").find(':selected').val()
+    var selectedAss = $("#rp-at-dl").find(':selected').val()
+    renderTable(selectedProject, selectedAudit, selectedAss)
+  }
+
+  function renderTable(project, audit, ass) {
+    //  $.ajax({
+    //   'url': url + "/result/filter?username=" + username + "&password=" + password + "&assessment=" + ass + "&audit=" + audit + "&project=" + project,
+    //   dataType: 'json',
+    //   type: 'GET',
+    //   success: function (response) {
+    //     console.log(response)
+    //     var result = response.data
+    //     var data = $('#rp-at-dl');
+    //     data.find("option").remove();
+    //     data.append('<option value="0" disable>Please Select Assessment</option>');
+    //     for (var i = 0; i < result.length; i += 1) {
+    //       $('#rp-at-dl').append('<option  value="' + result[i].ID + '" disable>' + result[i].Title + '</option>');
+    //     }
+    //   }
+    // });
+    $("#example").dataTable().fnDestroy()
+    var t = $('#example').DataTable({
+      "ajax": {
+        'url': url + "/result/filter?username=" + username + "&password=" + password + "&assessment=" + ass + "&audit=" + audit + "&project=" + project,
+        "dataSrc": function (d) {
+          console.log(d)
+          return d.data
+        }
+      },
+      "pageLength": 20,
+      // "order": [['1', 'asc']],
+      "processing": true,
+      "columns": [
+        {
+          "data": null
+        },
+        {
+          "data": "Assmnt_Type.Title"
+        },
+        {
+          "data": "Assmnt_Category.Title"
+        },
+        {
+          "data": function (data, type, output) {
+            if (data.Assmnt_Subcategory.Title) return data.Assmnt_Subcategory.Title
+            else return " - ";
+          }
+        },
+        {
+          "data": "Assmnt_Topic.Title"
+        },
+        {
+          "data": "Remarks"
+        },
+        {
+          "data": "Author.Title"
+        },
+        {
+          "data": "Weight"
+        }
+        
+      ],
+       rowsGroup: [// Always the array (!) of the column-selectors in specified order to which rows groupping is applied
+        // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
+        2,
+        3,
+        7
+      ]
+    });
+    t.on('order.dt search.dt', function () {
+      t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+        cell.innerHTML = i + 1;
+      });
+    }).draw();
+  }
+
+
+
+</script>

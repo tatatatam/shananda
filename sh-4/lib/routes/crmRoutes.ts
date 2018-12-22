@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import * as defect from './defect'
 import * as auth from './auth'
 import * as evidence from './evidence'
+import * as result from './result'
 dotenv.config()
 
 export class Routes {
@@ -14,5 +15,7 @@ export class Routes {
     app.route('/evidence/dropdownlist').post(evidence.dropdownList)
     app.route('/evidence/filter').get(evidence.evidencelsit)
     
+    app.route('/result/dropdownlist').post(result.dropdownList)
+    app.route('/result/filter').get(result.resultList)
   }
 }
