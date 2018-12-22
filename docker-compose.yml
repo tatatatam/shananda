@@ -7,51 +7,51 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
 
-  front-sh-1:
-    image: nginx
-    container_name: front-sh-v1
-    ports:
-      - 8081:80
-      - 3003:443
-    links:
-      - back-1
-    volumes:
-      - "./sh-1:/usr/share/nginx/html"
-    restart: always
+  # front-sh-1:
+  #   image: nginx
+  #   container_name: front-sh-v1
+  #   ports:
+  #     - 8081:80
+  #     - 3003:443
+  #   links:
+  #     - back-1
+  #   volumes:
+  #     - "./sh-1:/usr/share/nginx/html"
+  #   restart: always
   
-  back-1:
-    build: ./sh-1
-    image:  dev-ts:back
-    container_name: back-v1
-    command: yarn run start
-    ports:
-      - 3000:3000
-    volumes:
-      - ./sh-1:/app
-    restart: always
+  # back-1:
+  #   build: ./sh-1
+  #   image:  dev-ts:back
+  #   container_name: back-v1
+  #   command: yarn run start
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./sh-1:/app
+  #   restart: always
   
-  front-sh-2:
-    image: nginx
-    container_name: front-sh-v2
-    ports:
-      - 8082:80
-      - 3004:443
-    links:
-      - back-2
-    volumes:
-      - "./sh-2:/usr/share/nginx/html"
-    restart: always
+  # front-sh-2:
+  #   image: nginx
+  #   container_name: front-sh-v2
+  #   ports:
+  #     - 8082:80
+  #     - 3004:443
+  #   links:
+  #     - back-2
+  #   volumes:
+  #     - "./sh-2:/usr/share/nginx/html"
+  #   restart: always
   
-  back-2:
-    build: ./sh-2
-    image:  dev-ts-2:back
-    container_name: back-v2
-    command: yarn run start
-    ports:
-      - 3001:3000
-    volumes:
-      - ./sh-2:/app
-    restart: always
+  # back-2:
+  #   build: ./sh-2
+  #   image:  dev-ts-2:back
+  #   container_name: back-v2
+  #   command: yarn run start
+  #   ports:
+  #     - 3001:3000
+  #   volumes:
+  #     - ./sh-2:/app
+  #   restart: always
     
   front-sh-3:
     image: nginx
@@ -75,6 +75,29 @@ services:
     volumes:
       - ./sh-3:/app
       - ./sh-3/default.conf:/etc/nginx/conf.d/default.conf
+    restart: always
+
+  front-sh-4:
+    image: nginx
+    container_name: front-sh-v4
+    ports:
+      - 8082:80
+      - 3004:443
+    links:
+      - back-4
+    volumes:
+      - "./sh-4:/usr/share/nginx/html"
+    restart: always
+  
+  back-4:
+    build: ./sh-4
+    image:  dev-ts-4:back
+    container_name: back-v4
+    command: yarn run start
+    ports:
+      - 3001:3000
+    volumes:
+      - ./sh-4:/app
     restart: always
   # front-sh:
   #   image: nginx

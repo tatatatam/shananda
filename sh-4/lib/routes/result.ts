@@ -3,6 +3,7 @@ import * as request from 'request-promise';
 import * as spauth from 'node-sp-auth';
 import * as dotenv from "dotenv";
 import * as constants from 'constants';
+import { _ } from 'underscore'
 dotenv.config()
 
 export const dropdownList = (req: Request, res: Response) => {
@@ -82,11 +83,51 @@ export const resultList = (req: Request, res: Response) => {
         json: true,
       }).then(response => {
         let data = response.d.results;
-        var change = data.reduce( function (r, a){
-          
-        }, Object.create(null))
+        var group = _.groupBy(data,function(data){
+          return data.Assmnt_Category.Title
+        })
+        var group2 = _.groupBy(data, function(data){
+          return data.Assmnt_Subcategory.Title
+        })
+        var spliter = {}
+        var spliter2 = {}
+        for(var dt in group) {
+          // console.log(group[dt])
+          for( var i =0;i<group[dt].length;i++){
+            spliter[dt] = group[dt][i].Score+(spliter[dt]||0)
+          }
+          // }
+        }
+        for (var dt in group2) {
+          // console.log(group[dt])
+          for (var i = 0; i < group2[dt].length; i++) {
+            spliter2[dt] = group2[dt][i].Score + (spliter2[dt] || 0)
+          }
+        }
+        var group_arr = {};
+        for( dt in group){
+          group_arr[dt] = _.groupBy(group[dt], function(data){
+          return data.Assmnt_Subcategory.Title
+        })
+        }
+        var spliter_arr = {}
+        for(var dt in group_arr){
+          spliter_arr[dt] = {}
+          for(var sub in group_arr[dt]){
+            // console.log(group_arr[dt][sub].Score)
+            for (var i = 0; i < group_arr[dt][sub].length;i++)
+            spliter_arr[dt][sub] = group_arr[dt][sub][i].Score + (spliter_arr[dt][sub]||0)
+          }
+        }
+        console.log(spliter_arr)
+        for( var i=0 ;i<data.length;i++){
+          data[i]["Score_Cat"] = spliter[data[i].Assmnt_Category.Title]
+          data[i]["Score_Subcat"] = spliter_arr[data[i].Assmnt_Category.Title][data[i].Assmnt_Subcategory.Title]
+        }
+        
+       
         res.status(200).send({
-          data: response.d.results
+          data: data
         })
       });
     }).catch(err => {

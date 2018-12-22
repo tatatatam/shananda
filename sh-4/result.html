@@ -52,14 +52,17 @@
     <table id="example" class="display" style="width:100%">
       <thead>
         <tr>
-          <th>Category (Assmnt_Category)</th>
-          <th>Score Category</th>
-          <th>Sub-category (Assmnt_Subcategory)</th>
-          <th>Score Category</th>
+          <th>#</th>
+          <th>Cate</th>
+          <th>Score</th>
+          <th>SubCategory</th>
+          <th>Sub Score</th>
           <th>Topic (Assmnt_Topic)</th>
-          <th>Remarks</th>
-          <th>Evidence (Evidence_Image)</th>
+          <th>Remarks For long</th>
           <th>Created / By (Author)</th>
+          <th>Weight</th>
+          <th>Point</th>
+          <th>Score</th>
         </tr>
       </thead>
     </table>
@@ -223,17 +226,23 @@
         {
           "data": null
         },
-        {
-          "data": "Assmnt_Type.Title"
-        },
+        // {
+        //   "data": "Assmnt_Type.Title"
+        // },
         {
           "data": "Assmnt_Category.Title"
+        },
+         {
+           "data": "Score_Cat"
         },
         {
           "data": function (data, type, output) {
             if (data.Assmnt_Subcategory.Title) return data.Assmnt_Subcategory.Title
             else return " - ";
           }
+        },
+        {
+          "data": "Score_Subcat"
         },
         {
           "data": "Assmnt_Topic.Title"
@@ -246,14 +255,22 @@
         },
         {
           "data": "Weight"
+        },
+        {
+          "data": "Point"
+        },
+        {
+          "data": "Score"
         }
         
       ],
        rowsGroup: [// Always the array (!) of the column-selectors in specified order to which rows groupping is applied
         // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
+        1,
         2,
         3,
-        7
+        4
+        
       ]
     });
     t.on('order.dt search.dt', function () {
