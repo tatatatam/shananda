@@ -96,7 +96,7 @@ export const resultList = (req: Request, res: Response) => {
           // console.log(group[dt])
           for( var i =0;i<group[dt].length;i++){
             spliter[dt] = group[dt][i].Score+(spliter[dt]||0)
-            spliter_max[dt] = group[dt][i].Assmnt_Type.Max_Point + (spliter_max[dt] || 0)
+            spliter_max[dt] = group[dt][i].Assmnt_Type.Max_Point * group[dt][i].Weight + (spliter_max[dt] || 0)
           }
           // }
         }
