@@ -59,7 +59,7 @@ export const resultList = (req: Request, res: Response) => {
   const project_id = req.query.project;
   const audit_id = req.query.audit;
   const assessment_id = req.query.assessment;
-  url = "https://ananda365.sharepoint.com/sites/SmartQualityAssurance/_api/lists/getbytitle('SQA_AUDIT_RESULT')/items?$top=2000&$select=Title,Project/Title,Audit/Title,Assmnt_Type/Title,Assmnt_Category/Title,Assmnt_Subcategory/Title,Assmnt_Topic/Title,Created,Author/Title,Weight,Point,Score,Description,Remarks&$expand=Project,Audit,Assmnt_Type,Assmnt_Category,Assmnt_Subcategory,Assmnt_Topic,Author&$filter="
+  url = "https://ananda365.sharepoint.com/sites/SmartQualityAssurance/_api/lists/getbytitle('SQA_AUDIT_RESULT')/items?$top=2000&$select=Title,Project/Title,Audit/Title,Assmnt_Type/Title,Assmnt_Category/Title,Assmnt_Type/Max_Point,Assmnt_Subcategory/Title,Assmnt_Topic/Title,Created,Author/Title,Weight,Point,Score,Description,Remarks&$expand=Project,Audit,Assmnt_Type,Assmnt_Category,Assmnt_Subcategory,Assmnt_Topic,Author&$filter="
   let sumString = "";
   if (project_id != 0) sumString += " Project/ID eq " + project_id;
   if (audit_id != 0) sumString += " and Audit/ID eq " + audit_id;
@@ -90,11 +90,13 @@ export const resultList = (req: Request, res: Response) => {
           return data.Assmnt_Subcategory.Title
         })
         var spliter = {}
+        var spliter_max = {}
         var spliter2 = {}
         for(var dt in group) {
           // console.log(group[dt])
           for( var i =0;i<group[dt].length;i++){
             spliter[dt] = group[dt][i].Score+(spliter[dt]||0)
+            spliter_max[dt] = group[dt][i].Assmnt_Type.Max_Point + (spliter_max[dt] || 0)
           }
           // }
         }
@@ -107,21 +109,41 @@ export const resultList = (req: Request, res: Response) => {
         var group_arr = {};
         for( dt in group){
           group_arr[dt] = _.groupBy(group[dt], function(data){
-          return data.Assmnt_Subcategory.Title
-        })
+            return data.Assmnt_Subcategory.Title
+          })
         }
         var spliter_arr = {}
+        var spliter_arr_max = {} 
         for(var dt in group_arr){
           spliter_arr[dt] = {}
+          spliter_arr_max[dt] = {}
           for(var sub in group_arr[dt]){
             // console.log(group_arr[dt][sub].Score)
             for (var i = 0; i < group_arr[dt][sub].length;i++)
+              // console.log(group_arr[dt][sub][i].Assmnt_Type.Max_Point)
             spliter_arr[dt][sub] = group_arr[dt][sub][i].Score + (spliter_arr[dt][sub]||0)
+            // spliter_arr_max[dt][sub] = group_arr[dt][sub][i].Assmnt_Type.Max_Point + (spliter_arr_max[dt][sub] || 0)
           }
         }
+        for (var dt in group_arr) {
+          spliter_arr_max[dt] = {}
+          for (var sub in group_arr[dt]) {
+            // console.log(group_arr[dt][sub].Score)
+            for (var i = 0; i < group_arr[dt][sub].length; i++)
+              // console.log(group_arr[dt][sub][i].Assmnt_Type.Max_Point)
+              // spliter_arr[dt][sub] = group_arr[dt][sub][i].Score + (spliter_arr[dt][sub] || 0)
+
+              spliter_arr_max[dt][sub] = group_arr[dt][sub][i].Assmnt_Type.Max_Point * group_arr[dt][sub][i].Weight + (spliter_arr_max[dt][sub] || 0)
+          }
+        }
+        // console.log(spliter_arr_max)
+
+        // console.log(spliter_arr_max)
         for( var i=0 ;i<data.length;i++){
           data[i]["Score_Cat"] = spliter[data[i].Assmnt_Category.Title]
+          data[i]["Score_Cat_Max"] = spliter_max[data[i].Assmnt_Category.Title]
           data[i]["Score_Subcat"] = spliter_arr[data[i].Assmnt_Category.Title][data[i].Assmnt_Subcategory.Title]
+          data[i]["Score_Subcat_Max"] = spliter_arr_max[data[i].Assmnt_Category.Title][data[i].Assmnt_Subcategory.Title]
         }
         
        

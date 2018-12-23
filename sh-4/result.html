@@ -251,7 +251,9 @@
           "data": "Assmnt_Category.Title"
         },
          { "width": "2.5%",
-           "data": "Score_Cat"
+           "data": function(data, type, output) {
+             return data.Score_Cat + " / " + data.Score_Cat_Max;
+           },
         },
         { "width": "7.5%",
           "data": function (data, type, output) {
@@ -262,7 +264,7 @@
         },
         {  "width": "2.5%",
            "data": function (data, type, output) {
-            if (data.Assmnt_Subcategory.Title) return data.Score_Subcat
+            if (data.Assmnt_Subcategory.Title) return data.Score_Subcat+" / "+ data.Score_Subcat_Max
             else return "";
           },
         },
