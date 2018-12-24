@@ -64,6 +64,10 @@
   <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;margin-bottom:10px;" onclick="queryReport()">Request
     Button</button>
   <div>
+    <div class="containter">
+      <p style="font-weight: bold; display: inline;">เวลาที่สร้าง</p>
+      <p style="font-weight: bold;display: inline;" id="dateDisplay"></p>
+    </div>
 <div class="containter" style="width: 100%;" align="center">
   <table id="example" class="display" style="width:100%">
     <thead>
@@ -79,6 +83,12 @@
         <th>Score</th>
       </tr>
     </thead>
+    <tfoot>
+      <tr>
+        <th colspan="6" style="text-align:right">Overall(Topic Count / Score / Full / Percentage)</th>
+        <th colspan="3" style="text-align:left"></th>
+      </tr>
+    </tfoot>
   </table>
 </div>
   
@@ -207,25 +217,17 @@
     var selectedProject = $("#project-dl").find(':selected').val()
     var selectedAudit = $("#audit-dl").find(':selected').val()
     var selectedAss = $("#rp-at-dl").find(':selected').val()
-    renderTable(selectedProject, selectedAudit, selectedAss)
+    if(selectedProject==0 || selectedAudit==0 || selectedAss == 0){
+      alert("Please Choose QUERY IN DROPDOWN LIST")
+    }else {
+      renderTable(selectedProject, selectedAudit, selectedAss)
+    }
   }
 
   function renderTable(project, audit, ass) {
-    //  $.ajax({
-    //   'url': url + "/result/filter?username=" + username + "&password=" + password + "&assessment=" + ass + "&audit=" + audit + "&project=" + project,
-    //   dataType: 'json',
-    //   type: 'GET',
-    //   success: function (response) {
-    //     console.log(response)
-    //     var result = response.data
-    //     var data = $('#rp-at-dl');
-    //     data.find("option").remove();
-    //     data.append('<option value="0" disable>Please Select Assessment</option>');
-    //     for (var i = 0; i < result.length; i += 1) {
-    //       $('#rp-at-dl').append('<option  value="' + result[i].ID + '" disable>' + result[i].Title + '</option>');
-    //     }
-    //   }
-    // });
+    var dateDisplay = moment().format('MM/DD/YYYY hh:mm:ss');
+    $("#dateDisplay").text(dateDisplay)
+
     $("#example").dataTable().fnDestroy()
     var t = $('#example').DataTable({
       "ajax": {
@@ -294,7 +296,35 @@
         3,
         4
         
-      ]
+      ],
+      "footerCallback": function (row, data, start, end, display) {
+  
+       var api = this.api(), data;
+        console.log(data)
+        // Remove the formatting to get integer data for summation
+        if(data){
+              var total_score = 0
+              for(var i=0;i<data.length;i++){
+                total_score+=data[i].Score
+              }
+              var total_topic = data.length;
+              var total_full_score = 0
+              for (var i = 0; i < data.length; i++) {
+                total_full_score += data[i].Assmnt_Type.Max_Point*data[i].Weight
+              }
+              var overall_percentage = Math.round((total_score) / (total_full_score) * 10000) / 100
+              overall_percentage+= " %"
+              
+              // Total over all pages
+
+
+              // Total over this page
+              $(api.column(7).footer()).html(
+                 total_topic +" / "+total_score + " / " + total_full_score + " / " + overall_percentage
+              );
+            
+        }
+      }
     });
     t.on('order.dt search.dt', function () {
       t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {

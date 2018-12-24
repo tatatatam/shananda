@@ -24,6 +24,10 @@
         </tr>
     </table>
 </div>
+<div class="containter">
+    <p style="font-weight: bold; display: inline;">เวลาที่สร้าง</p>
+    <p style="font-weight: bold;display: inline;" id="dateDisplay"></p>
+</div>
 <table id="example" class="display" width="100%">
     <thead>
         <tr>
@@ -85,6 +89,7 @@
     var url_dev = "http://localhost:3000";
     var url_prod = "http://35.240.149.115:3002";
     var trigger = 1;
+    if (location.hostname == "localhost") trigger = 0;
     var url = trigger === 0 ? url_dev : url_prod;
     var username = window.localStorage.getItem("username");
     var password = window.localStorage.getItem("password");
@@ -251,6 +256,9 @@
     }
 
     function renderTable(data) {
+        var dateDisplay = moment().format('MM/DD/YYYY hh:mm:ss');
+        $("#dateDisplay").text(dateDisplay)
+        
         var tableData = [];
         var obj;
         for (const assoc in data) {

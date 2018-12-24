@@ -48,7 +48,10 @@
     </div>
     <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;margin-bottom:10px;" onclick="queryReport()">Request
         Button</button>
-    <div>
+    <div class="containter">
+        <p style="font-weight: bold; display: inline;">เวลาที่สร้าง</p>
+        <p style="font-weight: bold;display: inline;" id="dateDisplay"></p>
+    </div>
     <table id="example" class="display" style="width:100%">
         <thead>
             <tr>
@@ -191,6 +194,9 @@
     }
     
     function renderTable(project, audit, ass){
+        var dateDisplay = moment().format('MM/DD/YYYY hh:mm:ss');
+        $("#dateDisplay").text(dateDisplay)
+        
         $("#example").dataTable().fnDestroy()
         var t = $('#example').DataTable({
             "ajax": {
