@@ -264,7 +264,7 @@
         },
         {  "width": "2.5%",
            "data": function (data, type, output) {
-            if (data.Assmnt_Subcategory.Title) return data.Score_Subcat+" / "+ data.Score_Subcat_Max+ " ("+Math.roud(parseFloat(data.Score_Subcat)/parseFloat(data.Score_Subcat_Max)*10000)/100 +"%)"
+            if (data.Assmnt_Subcategory.Title) return data.Score_Subcat+" / "+ data.Score_Subcat_Max+ " ("+Math.round(parseFloat(data.Score_Subcat)/parseFloat(data.Score_Subcat_Max)*10000)/100 +"%)"
             else return "";
           },
         },
