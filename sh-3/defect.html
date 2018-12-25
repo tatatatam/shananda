@@ -49,7 +49,7 @@ crossorigin="anonymous">
           Category
         </td>
         <td>
-          <select id="rp-ct-dl">
+          <select id="rp-ct-dl" onchange="chnageSubCate()">
             <option value="0" disable>Please Select Category</option>
           </select><br />
         </td>
@@ -222,36 +222,40 @@ crossorigin="anonymous">
             data.find("option").remove();
             data.append('<option value="0" disable>Please Select Category</option>');
             for (var i = 0; i < result.length; i += 1) {
-              $('#rp-ct-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+              $('#rp-ct-dl').append('<option  value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
             }
           }
         });
 
-        $.ajax({
-         'url': url + '/dropdownlist',
-         dataType: 'json',
-         type: 'POST',
-         data: {
-           "username": username,
-           "password": password,
-           "dropdownlist": "subcategory",
-           "project": selectedProject
-         },
-         success: function (response) {
-           console.log(response)
-           var result = response.data
-           var data = $('#rp-sct-dl');
-           data.find("option").remove();
-           data.append('<option value="0" disable>Please Select Sub - Category</option>');
-           for (var i = 0; i < result.length; i += 1) {
-             $('#rp-sct-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
-           }
-         }
-       });
-
-
         
       }
+  function chnageSubCate(){
+     var selectedProject = $("#project-dl").find(':selected').val()
+     var selectedCategory = $("#rp-ct-dl").find(':selected').val()
+     var selectedCategory
+    $.ajax({
+      'url': url + '/dropdownlist',
+      dataType: 'json',
+      type: 'POST',
+      data: {
+        "username": username,
+        "password": password,
+        "dropdownlist": "subcategory",
+        "project": selectedProject,
+        "category_id": selectedCategory
+      },
+      success: function (response) {
+        console.log(response)
+        var result = response.data
+        var data = $('#rp-sct-dl');
+        data.find("option").remove();
+        data.append('<option value="0" disable>Please Select Sub - Category</option>');
+        for (var i = 0; i < result.length; i += 1) {
+          $('#rp-sct-dl').append('<option value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+        }
+      }
+    });
+  }
 
   function queryReportByStatusRpCompProject() {
     var selectedStatus = $("#status-dl").find(':selected').val();

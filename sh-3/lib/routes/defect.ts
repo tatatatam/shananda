@@ -70,11 +70,12 @@ export const dropdownList = (req: Request, res: Response) => {
   let url = "";
   const req_list = req.body.dropdownlist;
   const project_id = req.body.project;
+  const category_id = req.body.category_id
   const url_response_com = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_RESPONSE_COMPANY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "'";
   const url_project = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_PROJECT')/items?$select=ID,Title&$filter=ID eq 12 "
   const url_defect_st = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_STATUS')/items?$select=ID,Title"
   const url_cate = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "'";
-  const url_subcate = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "'";
+  const url_subcate = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "' and Category/ID eq '" + category_id +"'";
   if (req_list == "response_company") {
     url = url_response_com;
   }
