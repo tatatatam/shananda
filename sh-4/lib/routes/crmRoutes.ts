@@ -17,6 +17,6 @@ export class Routes {
     
     app.route('/result/dropdownlist').post(result.dropdownList)
     app.route('/result/filter').post(result.resultList)
-    app.route('/result/filterSum').get(result.resultListSummary)
+    app.route('/result/filterSum').post(result.resultListSummary)
   }
 }
