@@ -13,9 +13,9 @@ export class Routes {
     app.route('/auth').post(auth.login)
   
     app.route('/evidence/dropdownlist').post(evidence.dropdownList)
-    app.route('/evidence/filter').get(evidence.evidencelsit)
+    app.route('/evidence/filter').post(evidence.evidencelsit)
     
     app.route('/result/dropdownlist').post(result.dropdownList)
-    app.route('/result/filter').get(result.resultList)
+    app.route('/result/filter').post(result.resultList)
   }
 }

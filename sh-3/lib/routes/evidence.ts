@@ -65,6 +65,8 @@ export const evidencelsit = (req: Request, res: Response) => {
   if (assessment_id != 0) sumString += " and Assmnt_Type/ID eq "+assessment_id
   // if(url)
   url+= sumString
+  console.log(url)
+  console.log(username, password)
   spauth
     .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
       username: username,
