@@ -68,6 +68,29 @@
       <p style="font-weight: bold; display: inline;">เวลาที่สร้าง</p>
       <p style="font-weight: bold;display: inline;" id="dateDisplay"></p>
     </div>
+    <div class="containter" style="width: 100%;" align="center">
+  <table id="example2" class="display" style="width:100%">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Topic</th>
+        <th>Topic Count</th>
+        <th>Score</th>
+        <th>Max Score</th>
+        <th>Percentage</th>
+      </tr>
+    </thead>
+    <tfoot>
+      <tr>
+        <th colspan="2" style="text-align:right">Overall</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
 <div class="containter" style="width: 100%;" align="center">
   <table id="example" class="display" style="width:100%">
     <thead>
@@ -83,12 +106,12 @@
         <th>Score</th>
       </tr>
     </thead>
-    <tfoot>
+    <!-- <tfoot>
       <tr>
         <th colspan="6" style="text-align:right">Overall(Topic Count / Score / Full / Percentage)</th>
         <th colspan="3" style="text-align:left"></th>
       </tr>
-    </tfoot>
+    </tfoot> -->
   </table>
 </div>
   
@@ -221,6 +244,7 @@
       alert("Please Choose QUERY IN DROPDOWN LIST")
     }else {
       renderTable(selectedProject, selectedAudit, selectedAss)
+      renderTable_tab2(selectedProject, selectedAudit, selectedAss);
     }
   }
 
@@ -340,6 +364,142 @@
         cell.innerHTML = i + 1;
       });
       
+    }).draw();
+  
+  }
+  function renderTable_tab2(project, audit, ass){
+    
+    $("#example2").dataTable().fnDestroy()
+    var t = $('#example2').DataTable({
+      "ajax": {
+        'url': url + "/result/filterSum?username=" + username + "&password=" + password + "&assessment=" + ass + "&audit=" + audit + "&project=" + project,
+        "dataSrc": function (d) {
+          console.log("asfd")
+          console.log(d)
+          return d.data
+        }
+      },
+      "autoWidth": false,
+      "pageLength": 20,
+      "paging": false,
+      "searching": false,
+      "order": [['1', 'asc']],
+      "processing": true,
+      "columns": [
+        {
+          "data": null,
+          "width": '5%'
+        },
+        {
+          "data": "Cate_Name"
+        },
+        {
+          "width": "10%",
+          "data": "Topic_Count"
+        },
+        {
+          "width": "10%",
+          "data": "Score"
+        },
+        {
+          "width": "10%",
+          "data": "Max_Score"
+        },
+        {
+          "width": "2.5%",
+          "data": function (data, type, output) {
+            return  Math.round(parseFloat(data.Score) / parseFloat(data.Max_Score) * 10000) / 100 + "%"
+          },
+        },
+        // {
+        //   "width": "7.5%",
+        //   "data": function (data, type, output) {
+        //     if (data.Assmnt_Subcategory.Title) return data.Assmnt_Subcategory.Title
+        //     else return "";
+        //   },
+
+        // },
+        // {
+        //   "width": "2.5%",
+        //   "data": function (data, type, output) {
+        //     if (data.Assmnt_Subcategory.Title) return data.Score_Subcat + " / " + data.Score_Subcat_Max + " (" + Math.round(parseFloat(data.Score_Subcat) / parseFloat(data.Score_Subcat_Max) * 10000) / 100 + "%)"
+        //     else return "";
+        //   },
+        // },
+        // {
+        //   "width": "52.5%",
+        //   "data": function (data, type, output) {
+        //     var description = "- Description: " + (data.Description ? '<br/><pre>' + data.Description + "</pre>" : " - ")
+        //     var remark = "- Remarks: " + (data.Remarks ? '<br/><pre>' + data.Remarks + "</pre>" : " - ")
+        //     var show = data.Assmnt_Topic.Title + "<br/>" + description + "<br/>" + remark
+        //     return show
+        //   }
+        // },
+        // {
+        //   "width": "5%",
+        //   "data": "Weight"
+        // },
+        // {
+        //   "width": "5%",
+        //   "data": "Point"
+        // },
+        // {
+        //   "width": "5%",
+        //   "data": "Score"
+        // }
+
+      ],
+      // rowsGroup: [// Always the array (!) of the column-selectors in specified order to which rows groupping is applied
+      //   // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
+      //   1,
+      //   2,
+      //   3,
+      //   4
+
+      // ],
+      "footerCallback": function (row, data, start, end, display) {
+
+        var api = this.api(), data;
+        console.log(data)
+        // Remove the formatting to get integer data for summation
+        if (data) {
+          var total_score = 0
+          var total_topic = 0
+          var total_full_score = 0
+          var overall_percentage = 0
+          for (var i = 0; i < data.length; i++) {
+            total_full_score += data[i].Max_Score
+            total_score += data[i].Score
+            total_topic += data[i].Topic_Count
+          }
+          overall_percentage = Math.round((total_score) / (total_full_score) * 10000) / 100
+          overall_percentage += " %"
+
+          // Total over all pages
+
+
+          // Total over this page
+          $(api.column(2).footer()).html(
+            total_topic
+          );
+          $(api.column(3).footer()).html(
+            total_score
+          );
+          $(api.column(4).footer()).html(
+            total_full_score 
+          );
+          $(api.column(5).footer()).html(
+            overall_percentage
+          );
+
+        }
+      }
+    });
+    t.on('order.dt search.dt', function () {
+      t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+        cell.innerHTML = i + 1;
+      });
+
     }).draw();
   }
 
