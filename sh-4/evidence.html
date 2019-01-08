@@ -200,7 +200,16 @@
         $("#example").dataTable().fnDestroy()
         var t = $('#example').DataTable({
             "ajax": {
-                "url": url + "/evidence/filter?username="+username+"&password="+password+"&assessment="+ass+"&audit="+audit+"&project="+project,
+                "url": url + "/evidence/filter",
+                // ?username="+username+"&password="+password+"&assessment="+ass+"&audit="+audit+"&project="+project,
+                "type": 'POST',
+                "data": {
+                    "username": username,
+                    "password": password,
+                    "audit": audit,
+                    "assessment": ass,
+                    "project":project
+                },
                 "dataSrc": function (d) {
                     console.log(d)
                     return d.data

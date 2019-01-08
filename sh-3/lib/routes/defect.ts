@@ -12,14 +12,14 @@ export  const test = (req: Request, res: Response) => {
     };
 
 export const filterData = (req: Request, res: Response) => {
-  const response_company = req.query.response;
-  const category = req.query.category;
-  const subcategory = req.query.subcategory;
-  const status = req.query.status;
-  const project = req.query.project;
-  const username = req.query.username;
-  const password = req.query.password;
-  const pageId = req.query.page;
+  const response_company = req.body.response;
+  const category = req.body.category;
+  const subcategory = req.body.subcategory;
+  const status = req.body.status;
+  const project = req.body.project;
+  const username = req.body.username;
+  const password = req.body.password;
+  // const pageId = req.query.page;
   let sum_string = " Project/ID eq '" + project + "'";
   if (status != "0") {
     sum_string += " and Defect_Status eq '" + status + "'";
@@ -37,6 +37,7 @@ export const filterData = (req: Request, res: Response) => {
   }
   let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$top=2000&$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
   url += "&$filter=" + sum_string + "&$orderby=ID";
+  console.log(username, password)
   spauth
     .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
       username: username,

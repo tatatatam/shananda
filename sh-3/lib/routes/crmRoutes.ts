@@ -15,7 +15,7 @@ export class Routes {
     
     app.route('/').get( defect.test )
     app.route('/auth').post(auth.login)
-    app.route('/filter').get(defect.filterData)
+    app.route('/filter').post(defect.filterData)
     app.route('/dropdownlist').post(defect.dropdownList)
     app.route("/grantlist").post(defect.grantList)
     app.route('/defect').post(defect.defect)

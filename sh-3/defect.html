@@ -318,7 +318,18 @@ crossorigin="anonymous">
       "order": [['1','asc']],
       "processing": true,
       "ajax": {
-        "url": url + "/filter?response="+response+"&status="+status+"&project="+project+"&category="+category+"&subcategory="+subcategory+"&page="+pageId+"&username="+username+"&password="+password,
+        "url": url + "/filter",
+        // ?response="+response+"&status="+status+"&project="+project+"&category="+category+"&subcategory="+subcategory+"&page="+pageId+"&username="+username+"&password="+password,
+        "type": "POST",
+        "data": {
+          "username": username,
+          "password": password,
+          "response": response,
+          "status": status,
+          "project": project,
+          "category": category,
+          "subcategory": subcategory,
+        },
         "dataSrc": function (d) {
           console.log(d)
           localStorage.setItem('next', d.data.__next);
