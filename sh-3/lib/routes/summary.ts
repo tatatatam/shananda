@@ -144,7 +144,7 @@ export const grantList = (req: Request, res: Response) => {
         })
 }
 
-export const category = (req: Request, res: Response) => {
+export const getSumary = (req: Request, res: Response) => {
     const username = req.body.username;
     const password = req.body.password;
     const project = req.body.project;
@@ -162,7 +162,7 @@ export const category = (req: Request, res: Response) => {
 
             const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project&$filter=Project/ID eq " + project;
             const url_cat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$select=ID,Category_Code,Title,Is_Approved,Item_Type/Title,Project/ID&$expand=Item_Type,Project&$filter=Project/ID eq  " + project;
-            const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$select=ID,Title,Category/Category_Code,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status&$filter=Project/ID eq " + project;
+            const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$select=ID,Title,Category/Category_Code,Category/ID,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status&$filter=Project/ID eq " + project;
 
             request.get({
                 url: url_cat,
@@ -179,7 +179,45 @@ export const category = (req: Request, res: Response) => {
                         headers: headers,
                         json: true,
                     }).then(response_defect => {
-                        
+                        // var group2 = _.groupBy(data, function (data) {
+                            //     return data.Assmnt_Subcategory.Title
+                           
+                        // })
+                        var groupCatById = _.groupBy(response_cat.d.results, function (data) {
+                            return data.ID
+                        })
+                        var groupSubcatById = _.groupBy(response_subcat.d.results, function (data) {
+                            return data.Category.ID
+                        })
+                        var groupDefectById = _.groupBy(response_defect.d.results, function (data) {
+                            return data.Category.ID
+                        })
+                        var groupPass = {}
+                        for(var cat_id in groupDefectById){
+                            var pass = 0;
+                            var notPass = 0;
+                            for (var i = 0; i < groupDefectById[cat_id].length;i++){
+                                if (groupDefectById[cat_id][i].Defect_Status.Title == "PASS") pass++
+                                else notPass ++ 
+                            }
+                            // console.log(groupDefectById[cat_id])
+                            groupPass[cat_id] = {PASS:0, NOT_PASS:0}
+                            groupPass[cat_id]["PASS"] = pass
+                            groupPass[cat_id]["NOT_PASS"] = notPass
+
+                        }
+                        var outputData = []
+                        for (var cat_id in groupSubcatById){
+                            for( var j=0;j<groupSubcatById[cat_id].length;j++){
+                                groupSubcatById[cat_id][j]["Cat_Data"] = groupCatById[cat_id][0]
+                                if (groupPass[cat_id]){
+                                    groupSubcatById[cat_id][j]["PASS"] = groupPass[cat_id].PASS
+                                    groupSubcatById[cat_id][j]["NOT_PASS"] = groupPass[cat_id].NOT_PASS
+                                }
+                                outputData.push(groupSubcatById[cat_id][j])
+                            }
+                        }
+                        res.json(outputData)
                     });
                 });
             });

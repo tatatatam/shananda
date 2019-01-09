@@ -7,6 +7,7 @@ import * as constants from 'constants';
 import * as defect from './defect'
 import * as auth from './auth'
 import * as evidence from './evidence'
+import * as summary from './summary'
 dotenv.config()
 
 export class Routes {
@@ -24,5 +25,7 @@ export class Routes {
     
     app.route('/evidence/dropdownlist').post(evidence.dropdownList)
     app.route('/evidence/filter').get(evidence.evidencelsit)
-    }
+    
+    app.route('/summary').post(summary.getSumary)
+  }
 }

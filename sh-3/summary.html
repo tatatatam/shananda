@@ -1,0 +1,203 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<style>
+  select {
+    border: 1px solid #ccc;
+    font-size: 16px;
+    height: 34px;
+    width: 268px;
+    margin-top: 10px;
+  }
+</style>
+<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous">
+
+<body>
+  <div class="containter" style="width: 100%;" align="center">
+
+    <table class="display" style="width:100%">
+      <tr>
+        <td>
+          Project
+        </td>
+        <td>
+          <select id="project-dl" onchange="changeRescomp()">
+            <option value="0" disable>Please Select Project</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Is Has Defect</td>
+        <td>
+          <input id="h-defect" type="checkbox">
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div>
+
+    <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-top:10px;" onclick="queryReportByStatusRpCompProject()">Request
+      Button</button>
+  </div>
+  </div>
+
+
+  <br />
+  <br />
+  <br />
+  <div class="containter">
+    <p style="font-weight: bold; display: inline;">เวลาที่สร้าง</p>
+    <p style="font-weight: bold;display: inline;" id="dateDisplay"></p>
+  </div>
+  <table id="example" class="display" style="width:100%">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Defect Id</th>
+        <th>Inspection / Date</th>
+        <th>Title / Description</th>
+        <th>Category / Sub-Category</th>
+        <th>Defect (Image)</th>
+        <th>Defect Area (Image) </th>
+        <th>Status</th>
+        <th>Response Company</th>
+        <th>Target Date</th>
+        <th>Correction (Image)</th>
+      </tr>
+    </thead>
+  </table>
+
+</body>
+
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+<script src="http://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+<!-- <script src=""></script><script src=""></script> -->
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+
+  var url_dev = "http://localhost:3000";
+  var url_prod = "http://35.240.149.115:3002";
+  var trigger = 1;
+  if (location.hostname == "localhost") trigger = 0;
+  var url = trigger === 0 ? url_dev : url_prod;
+  console.log(url)
+  var username = window.localStorage.getItem("username");
+  var password = window.localStorage.getItem("password");
+  $(document).ready(function () {
+    unAuthChecker();
+    initDropDownlist();
+  });
+
+  function unAuthChecker() {
+    var username = window.localStorage.getItem("username");
+    var password = window.localStorage.getItem("password");
+    if (username && password) {
+      console.log(username, password);
+    } else {
+      window.location = "/"
+    }
+  }
+
+  function initDropDownlist() {
+    $.ajax({
+      'url': url + '/grantlist',
+      dataType: 'json',
+      type: 'POST',
+      data: {
+        "username": username,
+        "password": password,
+      },
+      success: function (response) {
+        var result = response.d.results
+        for (var i = 0; i < result.length; i += 1) {
+          $('#project-dl').append('<option value="' + result[i].Project.ID + '" disable>' + result[i].Project.Title + '</option>');
+        }
+      }
+    });
+  }
+ 
+  
+  function queryReportByStatusRpCompProject() {
+    // var selectedStatus = $("#status-dl").find(':selected').val();
+    // var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
+    var selectedProject = $("#project-dl").find(':selected').val()
+    // var selectedCategory = $("#rp-ct-dl").find(':selected').val()
+    // var selectedSubCategory = $("#rp-sct-dl").find(':selected').val()
+    
+    if (selectedProject != "0") {
+      //  $.ajax({
+      //   url: url + "/summary",
+      //   method: "POST",
+      //   data: {
+      //     "username": username,
+      //     "password": password,
+      //     "project": selectedProject
+      //   },
+      //   success: function (data) {  
+      //     console.log(data)
+      //   }
+      // });
+    
+      renderDataTable( selectedProject);
+    } else {
+      // $("#status-dl").wrapInner("<p>Error Herer</p>")
+      alert("You have to choose select project")
+    }
+  }
+
+  function renderDataTable( project) {
+    var dateDisplay = moment().format('DD/MM/YYYY');
+    $("#dateDisplay").text(dateDisplay)
+    $("#example").dataTable().fnDestroy()
+    var t = $('#example').DataTable({
+      "pageLength": 20,
+      // dom: 'Bfrtip',
+      "order": [['1', 'asc']],
+      "processing": true,
+      "ajax": {
+        "url": url + "/summary",
+        // ?response="+response+"&status="+status+"&project="+project+"&category="+category+"&subcategory="+subcategory+"&page="+pageId+"&username="+username+"&password="+password,
+        "type": "POST",
+        "data": {
+          "username": username,
+          "password": password,
+          "project": project,
+        },
+        "dataSrc": function (d) {
+          console.log(d)
+          return d
+        }
+      },
+      "columns": [
+        {
+          "data": null
+        },
+        {
+          "data": function (data, type, output) {
+            return data.PASS;
+          }
+        },
+      ]
+    });
+    t.on('order.dt search.dt', function () {
+      t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+        cell.innerHTML = i + 1;
+      });
+
+    }).draw();
+  }
+ 
+</script>
