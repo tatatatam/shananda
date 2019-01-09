@@ -1,0 +1,189 @@
+import { Request, Response } from "express";
+import * as request from 'request-promise';
+import * as spauth from 'node-sp-auth';
+import * as dotenv from "dotenv";
+import * as constants from 'constants';
+import { _ } from 'underscore';
+dotenv.config()
+
+export const filterData = (req: Request, res: Response) => {
+    const response_company = req.query.response;
+    const category = req.query.category;
+    const subcategory = req.query.subcategory;
+    const status = req.query.status;
+    const project = req.query.project;
+    const username = req.query.username;
+    const password = req.query.password;
+    const pageId = req.query.page;
+    let sum_string = " Project/ID eq '" + project + "'";
+    if (status != "0") {
+        sum_string += " and Defect_Status eq '" + status + "'";
+    }
+    if (response_company != "0") {
+        sum_string += " and Response_Company/ID eq '" + response_company + "'";
+    }
+
+    if (category != "0") {
+        sum_string += " and Category/ID eq '" + category + "'";
+    }
+
+    if (subcategory != "0") {
+        sum_string += " and Sub_x002d_category/ID eq '" + subcategory + "'";
+    }
+    let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$top=2000&$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
+    url += "&$filter=" + sum_string + "&$orderby=ID";
+    spauth
+        .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+        })
+        .then(data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+            request.get({
+                url: url,
+                headers: headers,
+                json: true,
+            }).then(response => {
+                // console.log(response);
+                res.status(200).send({
+                    data: response.d
+                })
+            });
+        }).catch(err => {
+            console.log(err)
+        })
+}
+
+export const dropdownList = (req: Request, res: Response) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    console.log(req.query);
+    let url = "";
+    const req_list = req.body.dropdownlist;
+    const project_id = req.body.project;
+    const category_id = req.body.category_id
+    const url_response_com = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_RESPONSE_COMPANY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "'";
+    const url_project = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_PROJECT')/items?$select=ID,Title&$filter=ID eq 12 "
+    const url_defect_st = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_STATUS')/items?$select=ID,Title"
+    const url_cate = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "'";
+    const url_subcate = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$select=ID,Title,Project/ID&$expand=Project&$filter=Project/ID eq '" + project_id + "' and Category/ID eq '" + category_id + "'";
+    if (req_list == "response_company") {
+        url = url_response_com;
+    }
+    else if (req_list == "project") {
+        url = url_project;
+    }
+    else if (req_list == "category") {
+        url = url_cate;
+    }
+    else if (req_list == "subcategory") {
+        url = url_subcate;
+    }
+    else {
+        url = url_defect_st;
+    }
+    spauth
+        .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+        })
+        .then(data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+            console.log(url);
+            request.get({
+                url: url,
+                headers: headers,
+                json: true,
+            }).then(response => {
+                console.log(response);
+                res.status(200).send({
+                    data: response.d.results
+                })
+            });
+        }).catch(err => {
+            console.log(err)
+        })
+}
+
+export const grantList = (req: Request, res: Response) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    console.log(username, password)
+    spauth
+        .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+        }).then(data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+            console.log(data)
+            const url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_USER_ROLE')/items?$top=2000&$select=Project/ID,Project/Title,User/Name&$expand=Project,User&$filter=substringof('" + username + "',User/Name)";
+            request.get({
+                url: url,
+                headers: headers,
+                json: true,
+            }).then(response => {
+                res.json(response);
+            }).catch(err => {
+                res.json(err);
+            })
+        })
+        .catch(err => {
+            res.json(err);
+        })
+}
+
+export const category = (req: Request, res: Response) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const project = req.body.project;
+    spauth
+        .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
+            username: username,
+            password: password
+        })
+        .then(data => {
+            var headers = data.headers;
+            headers['Accept'] = 'application/json;odata=verbose';
+            headers['secureOptions'] = constants.SSL_OP_NO_TLSv1_2;
+            headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
+            headers['honorCipherOrder'] = true;
+
+            const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project&$filter=Project/ID eq " + project;
+            const url_cat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$select=ID,Category_Code,Title,Is_Approved,Item_Type/Title,Project/ID&$expand=Item_Type,Project&$filter=Project/ID eq  " + project;
+            const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$select=ID,Title,Category/Category_Code,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status&$filter=Project/ID eq " + project;
+
+            request.get({
+                url: url_cat,
+                headers: headers,
+                json: true,
+            }).then(response_cat => {
+                request.get({
+                    url: url_subcat,
+                    headers: headers,
+                    json: true,
+                }).then(response_subcat => {
+                    request.get({
+                        url: url_defect,
+                        headers: headers,
+                        json: true,
+                    }).then(response_defect => {
+                        
+                    });
+                });
+            });
+        }).catch(err => {
+            console.log(err)
+        })
+}

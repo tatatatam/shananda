@@ -309,7 +309,7 @@ crossorigin="anonymous">
     
   
   function renderDataTable(response, project, status, category, subcategory, pageId) {
-     var dateDisplay = moment().format('MM/DD/YYYY hh:mm:ss');
+     var dateDisplay = moment().format('DD/MM/YYYY');
      $("#dateDisplay").text(dateDisplay)
      $("#example").dataTable().fnDestroy()
      var t = $('#example').DataTable({
