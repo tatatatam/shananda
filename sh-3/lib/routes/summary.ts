@@ -148,6 +148,7 @@ export const getSumary = (req: Request, res: Response) => {
     const username = req.body.username;
     const password = req.body.password;
     const project = req.body.project;
+    const isHas = req.body.isHas;
     spauth
         .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
             username: username,
@@ -207,6 +208,7 @@ export const getSumary = (req: Request, res: Response) => {
 
                         }
                         var outputData = []
+                        console.log(isHas)
                         for (var cat_id in groupSubcatById){
                             for( var j=0;j<groupSubcatById[cat_id].length;j++){
                                 groupSubcatById[cat_id][j]["Cat_Data"] = groupCatById[cat_id][0]
@@ -214,7 +216,14 @@ export const getSumary = (req: Request, res: Response) => {
                                     groupSubcatById[cat_id][j]["PASS"] = groupPass[cat_id].PASS
                                     groupSubcatById[cat_id][j]["NOT_PASS"] = groupPass[cat_id].NOT_PASS
                                 }
-                                outputData.push(groupSubcatById[cat_id][j])
+                                if (groupPass[cat_id]) {
+                                    outputData.push(groupSubcatById[cat_id][j])
+                                }else {
+                                    if (isHas == "true") {
+
+                                    }
+                                    else outputData.push(groupSubcatById[cat_id][j])
+                                }
                             }
                         }
                         res.json(outputData)

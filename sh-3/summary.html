@@ -23,7 +23,7 @@
           Project
         </td>
         <td>
-          <select id="project-dl" onchange="changeRescomp()">
+          <select id="project-dl"">
             <option value="0" disable>Please Select Project</option>
           </select>
         </td>
@@ -55,16 +55,14 @@
     <thead>
       <tr>
         <th>No.</th>
-        <th>Defect Id</th>
-        <th>Inspection / Date</th>
-        <th>Title / Description</th>
-        <th>Category / Sub-Category</th>
-        <th>Defect (Image)</th>
-        <th>Defect Area (Image) </th>
-        <th>Status</th>
-        <th>Response Company</th>
-        <th>Target Date</th>
-        <th>Correction (Image)</th>
+        <th>รับมอบ</th>
+        <th>Category</th>
+        <th>Sub-category</th>
+        <th>Total</th>
+        <th>Pending</th>
+        <th>Done</th>
+        <th>% Progress</th>
+        <th>Hidden Column</th>
       </tr>
     </thead>
   </table>
@@ -83,6 +81,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
 <script src="http://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.0.4/js/dataTables.rowGroup.min.js"></script>
 <!-- <script src=""></script><script src=""></script> -->
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -131,12 +130,8 @@
  
   
   function queryReportByStatusRpCompProject() {
-    // var selectedStatus = $("#status-dl").find(':selected').val();
-    // var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
     var selectedProject = $("#project-dl").find(':selected').val()
-    // var selectedCategory = $("#rp-ct-dl").find(':selected').val()
-    // var selectedSubCategory = $("#rp-sct-dl").find(':selected').val()
-    
+    var selectedIsHas = $("#h-defect").prop('checked')
     if (selectedProject != "0") {
       //  $.ajax({
       //   url: url + "/summary",
@@ -151,30 +146,44 @@
       //   }
       // });
     
-      renderDataTable( selectedProject);
+      renderDataTable( selectedProject, selectedIsHas);
     } else {
       // $("#status-dl").wrapInner("<p>Error Herer</p>")
       alert("You have to choose select project")
     }
   }
 
-  function renderDataTable( project) {
+  function renderDataTable( project, isHas) {
     var dateDisplay = moment().format('DD/MM/YYYY');
     $("#dateDisplay").text(dateDisplay)
     $("#example").dataTable().fnDestroy()
     var t = $('#example').DataTable({
       "pageLength": 20,
       // dom: 'Bfrtip',
-      "order": [['1', 'asc']],
+      "order": [['8', 'asc'],['1', 'asc']],
+      rowGroup: {
+        // endRender: function (rows, group) {
+        //   var avg = rows
+        //     .data()
+        //     .pluck(5)
+        //     .reduce(function (a, b) {
+        //       return a + b.replace(/[^\d]/g, '') * 1;
+        //     }, 0) / rows.count();
+
+        //   return 'Average salary in ' + group + ': ' +
+        //     $.fn.dataTable.render.number(',', '.', 0, '$').display(avg);
+        // },
+        dataSrc:  "Cat_Data.Item_Type.Title"
+      },
       "processing": true,
       "ajax": {
         "url": url + "/summary",
-        // ?response="+response+"&status="+status+"&project="+project+"&category="+category+"&subcategory="+subcategory+"&page="+pageId+"&username="+username+"&password="+password,
         "type": "POST",
         "data": {
           "username": username,
           "password": password,
           "project": project,
+          "isHas": isHas
         },
         "dataSrc": function (d) {
           console.log(d)
@@ -187,14 +196,64 @@
         },
         {
           "data": function (data, type, output) {
-            return data.PASS;
+            if(data.Cat_Data.Is_Approved)
+            return "Yes"
+            else return "No"
           }
         },
+        {
+          "data": function (data, type, output) {
+            return data.Category.Title;
+          }
+        },
+        {
+          "data": function (data, type, output) {
+            return data.Title;
+          }
+        },
+        {
+          "data": function (data, type, output) {
+            if(typeof (data.PASS) !== 'undefined' && typeof (data.NOT_PASS) !== 'undefined') return data.PASS + data.NOT_PASS
+            else return 0
+          }
+        },
+        {
+          "data": function (data, type, output) {
+            if (typeof (data.NOT_PASS) !== 'undefined') return data.NOT_PASS
+            else return "N/A"
+          }
+        },
+        {
+          "data": function (data, type, output) {
+            if(typeof(data.PASS)!== 'undefined') return data.PASS
+            else return "N/A"
+          }
+        },
+        {
+          "data": function (data, type, output) {
+             if (typeof (data.PASS) !== 'undefined' && typeof (data.NOT_PASS) !== 'undefined') return  Math.round(parseFloat(data.PASS) / parseFloat(data.PASS+data.NOT_PASS) * 10000) / 100 + "%"
+             else return 0 +" %"
+          }
+         },
+          {
+          "data": function (data, type, output) {
+            return data.Cat_Data.Item_Type.Title
+          },
+          "visible": false
+        },
+         
       ]
     });
     t.on('order.dt search.dt', function () {
       t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
         cell.innerHTML = i + 1;
+      });
+      t.column(1, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+        if(cell.innerHTML == "No") {
+          $(cell).css('background-color', 'Red');
+        }else {
+          $(cell).css('background-color', 'Green');
+        }
       });
 
     }).draw();
