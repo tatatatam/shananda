@@ -161,9 +161,9 @@ export const getSumary = (req: Request, res: Response) => {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
 
-            const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$top=2000&$$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project&$filter=Project/ID eq " + project;
-            const url_cat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$top=2000&$$select=ID,Category_Code,Title,Is_Approved,Item_Type/Title,Project/ID&$expand=Item_Type,Project&$filter=Project/ID eq  " + project;
-            const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$top=2000&$$select=ID,Title,Category/Category_Code,Category/ID,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status&$filter=Project/ID eq " + project;
+            const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$top=2000&$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project&$filter=Project/ID eq " + project;
+            const url_cat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$top=2000&$select=ID,Category_Code,Title,Is_Approved,Item_Type/Title,Project/ID&$expand=Item_Type,Project&$filter=Project/ID eq  " + project;
+            const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$top=2000&$select=ID,Title,Category/Category_Code,Category/ID,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status&$filter=Project/ID eq " + project;
 
             request.get({
                 url: url_cat,
