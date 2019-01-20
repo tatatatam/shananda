@@ -161,8 +161,8 @@ export const getSumary = (req: Request, res: Response) => {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
 
-            const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$top=2000&$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project&$filter=Project/ID eq " + project;
             const url_cat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$top=2000&$select=ID,Category_Code,Title,Is_Approved,Item_Type/Title,Project/ID&$expand=Item_Type,Project&$filter=Project/ID eq  " + project;
+            const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$top=2000&$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project&$filter=Project/ID eq " + project;
             const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$top=2000&$select=ID,Title,Category/Category_Code,Category/ID,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status&$filter=Project/ID eq " + project;
 
             request.get({
@@ -184,6 +184,8 @@ export const getSumary = (req: Request, res: Response) => {
                             //     return data.Assmnt_Subcategory.Title
                            
                         // })
+                        console.log(response_defect)
+                        var catData = response_cat.d.results
                         var groupCatById = _.groupBy(response_cat.d.results, function (data) {
                             return data.ID
                         })
@@ -192,6 +194,13 @@ export const getSumary = (req: Request, res: Response) => {
                         })
                         var groupDefectById = _.groupBy(response_defect.d.results, function (data) {
                             return data.Category.ID
+                        })
+                       
+                        var groupSubcatByIdSubCat = _.groupBy(response_subcat.d.results, function (data) {
+                            return data.Subcategory_Code
+                        })
+                        var groupDefectByIdSubCat =  _.groupBy(response_defect.d.results, function (data) {
+                            return data.Sub_x002d_category.Subcategory_Code
                         })
                         var groupPass = {}
                         for(var cat_id in groupDefectById){
@@ -207,8 +216,45 @@ export const getSumary = (req: Request, res: Response) => {
                             groupPass[cat_id]["NOT_PASS"] = notPass
 
                         }
+                        var groupPass_sub = {}
+                        for (var sub_cat_id in groupDefectByIdSubCat) {
+                            pass = 0;
+                            notPass = 0;
+                            for (var i = 0; i < groupDefectByIdSubCat[sub_cat_id].length; i++) {
+                                if (groupDefectByIdSubCat[sub_cat_id][i].Defect_Status.Title == "PASS") pass++
+                                else notPass++
+                            }
+                            // console.log(groupDefectById[cat_id])
+                            groupPass_sub[sub_cat_id] = { PASS: 0, NOT_PASS: 0 }
+                            groupPass_sub[sub_cat_id]["PASS"] = pass
+                            groupPass_sub[sub_cat_id]["NOT_PASS"] = notPass
+
+                        }
+                        
+
                         var outputData = []
                         console.log(isHas)
+                        for (var sub_cat in groupSubcatByIdSubCat){
+                            for (var j = 0; j < groupSubcatByIdSubCat[sub_cat].length;j++){
+                                var cat_id = groupSubcatByIdSubCat[sub_cat][j].Category.ID
+                                groupSubcatByIdSubCat[sub_cat][j]["Cat_Data"] = groupCatById[cat_id][0]
+                                if (groupPass_sub[sub_cat]) {
+                                    groupSubcatByIdSubCat[sub_cat][j]["PASS"] = groupPass_sub[sub_cat].PASS
+                                    groupSubcatByIdSubCat[sub_cat][j]["NOT_PASS"] = groupPass_sub[sub_cat].NOT_PASS
+                                }
+                                if (groupPass_sub[sub_cat]) {
+                                    outputData.push(groupSubcatByIdSubCat[sub_cat][j])
+                                } else {
+                                    if (isHas == "true") {
+
+                                    }
+                                    else outputData.push(groupSubcatByIdSubCat[sub_cat][j])
+                                }
+                            }
+                        }
+                        console.log(outputData)
+                        //cat data
+                        /*
                         for (var cat_id in groupSubcatById){
                             for( var j=0;j<groupSubcatById[cat_id].length;j++){
                                 groupSubcatById[cat_id][j]["Cat_Data"] = groupCatById[cat_id][0]
@@ -226,6 +272,7 @@ export const getSumary = (req: Request, res: Response) => {
                                 }
                             }
                         }
+                        */
                         res.json(outputData)
                     });
                 });
