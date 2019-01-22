@@ -93,15 +93,12 @@ export const resultList = (req: Request, res: Response) => {
         var spliter_max = {}
         var spliter2 = {}
         for(var dt in group) {
-          // console.log(group[dt])
           for( var i =0;i<group[dt].length;i++){
             spliter[dt] = group[dt][i].Score+(spliter[dt]||0)
             spliter_max[dt] = group[dt][i].Assmnt_Type.Max_Point * group[dt][i].Weight + (spliter_max[dt] || 0)
           }
-          // }
         }
         for (var dt in group2) {
-          // console.log(group[dt])
           for (var i = 0; i < group2[dt].length; i++) {
             spliter2[dt] = group2[dt][i].Score + (spliter2[dt] || 0)
           }
@@ -118,21 +115,14 @@ export const resultList = (req: Request, res: Response) => {
           spliter_arr[dt] = {}
           spliter_arr_max[dt] = {}
           for(var sub in group_arr[dt]){
-            // console.log(group_arr[dt][sub].Score)
             for (var i = 0; i < group_arr[dt][sub].length;i++)
-              // console.log(group_arr[dt][sub][i].Assmnt_Type.Max_Point)
             spliter_arr[dt][sub] = group_arr[dt][sub][i].Score + (spliter_arr[dt][sub]||0)
-            // spliter_arr_max[dt][sub] = group_arr[dt][sub][i].Assmnt_Type.Max_Point + (spliter_arr_max[dt][sub] || 0)
           }
         }
         for (var dt in group_arr) {
           spliter_arr_max[dt] = {}
           for (var sub in group_arr[dt]) {
-            // console.log(group_arr[dt][sub].Score)
             for (var i = 0; i < group_arr[dt][sub].length; i++)
-              // console.log(group_arr[dt][sub][i].Assmnt_Type.Max_Point)
-              // spliter_arr[dt][sub] = group_arr[dt][sub][i].Score + (spliter_arr[dt][sub] || 0)
-
               spliter_arr_max[dt][sub] = group_arr[dt][sub][i].Assmnt_Type.Max_Point * group_arr[dt][sub][i].Weight + (spliter_arr_max[dt][sub] || 0)
           }
         }
@@ -146,10 +136,35 @@ export const resultList = (req: Request, res: Response) => {
           data[i]["Score_Subcat_Max"] = spliter_arr_max[data[i].Assmnt_Category.Title][data[i].Assmnt_Subcategory.Title]
         }
         
-       
-        res.status(200).send({
-          data: data
+        data = _.sortBy(data, function (data) {
+          return data.Assmnt_Category.Title
         })
+        let gCat = _.groupBy(data, function (data) {
+          return data.Assmnt_Category.Title
+        })
+        let gSubCat = _.groupBy(data, function (data) {
+          return data.Assmnt_Subcategory.Title
+        })
+        // console.log(group)
+        console.log('--------------------------------')
+        if(data) {
+          let keyArr = _.allKeys(gSubCat) 
+          console.log(keyArr)
+          if (keyArr[0] == 'undefined'){
+            res.status(200).send({
+              type: "Category",
+              data: gCat
+            })
+          } else {
+            res.status(200).send({
+              type: "Subcategory",
+              data: gCat
+            })
+          }
+        }
+        // res.status(200).send({
+        //   data: data
+        // })
       });
     }).catch(err => {
       console.log(err)
