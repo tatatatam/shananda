@@ -26,6 +26,12 @@
     word-wrap: break-word; /* IE 5.5+ */
     white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
 }
+.right-side{
+  text-align: right;
+}
+.center-side{
+  text-align: center;
+}
 
 </style>
 
@@ -94,7 +100,7 @@
 <div id="creator">
 
 </div>
-<div class="containter" style="width: 100%;" align="center">
+<!-- <div class="containter" style="width: 100%;" align="center">
   <table id="example" class="display" style="width:100%">
     <thead>
       <tr>
@@ -109,13 +115,13 @@
         <th>Score</th>
       </tr>
     </thead>
-    <!-- <tfoot>
+    <tfoot>
       <tr>
         <th colspan="6" style="text-align:right">Overall(Topic Count / Score / Full / Percentage)</th>
         <th colspan="3" style="text-align:left"></th>
       </tr>
-    </tfoot> -->
-  </table>
+    </tfoot>
+  </table> -->
 </div>
   
 </body>
@@ -273,7 +279,7 @@
         var count = 1
         for( var key in data ){
           var header = makeHeaderCat(data[key][0])
-          var tableName = createTable(count++, header)
+          var tableName = createTable(count++, header,type)
           if(type=='Subcategory'){
             renderingTable(tableName, data[key])
           }else {
@@ -284,34 +290,47 @@
     });
   }
   function makeHeaderCat(data) {
-    return  data.Assmnt_Category.Title+" "+data.Score_Cat + " / " + data.Score_Cat_Max + " (" + Math.round(parseFloat(data.Score_Cat) / parseFloat(data.Score_Cat_Max) * 10000) / 100 + "%)"
+    return  data.Assmnt_Category.Title+" "+data.Score_Cat + " / " + data.Score_Cat_Max + " (" + toFixedPecentage(Math.round(parseFloat(data.Score_Cat) / parseFloat(data.Score_Cat_Max) * 10000) / 100) + "%)"
   }
  
-  function createTable(indexTable, header){
+  function createTable(indexTable, header, type){
     var tableId = "dtGenerate"
     var id = '#creator'
    
-    $(id).append(getHtmlTable(tableId + indexTable, header))
+    if(type=='Subcategory')  $(id).append(getHtmlTable(tableId + indexTable, header))
+    else $(id).append(getHtmlTableWithoutSubcat(tableId + indexTable, header))
     return '#'+tableId+indexTable
   }
 
-   function getHtmlTable(tableId, contentHeader) {
+  function getHtmlTable(tableId, contentHeader) {
+    return '<div class="containter" style="width: 100%;" align="center"> ' +
+      '<p style="background-color: #000000; color: white;">'+ contentHeader +'</p>'+
+      '<table id = "' + tableId + '" class="display" style = "width:100%" >\
+              <thead ><tr>\
+                      <th>#</th>\
+                      <th>Subcategory</th>\
+                      <th>Sub Score</th>\
+                      <th>Topic</th>\
+                      <th>Weight</th>\
+                      <th>Point</th>\
+                      <th>Score</th>\
+              </tr></thead>\
+            </table >\
+      </div >';
+  }
+  function getHtmlTableWithoutSubcat(tableId, contentHeader) {
       return '<div class="containter" style="width: 100%;" align="center"> ' +
-        '<p>'+ contentHeader +'</p>'+
+        '<p style="background-color: #000000; color: white;">' + contentHeader + '</p>' +
         '<table id = "' + tableId + '" class="display" style = "width:100%" >\
-                <thead style="display: none;"><tr>\
-                        <th>#</th>\
-                        <th>Category</th>\
-                        <th>Score</th>\
-                        <th>Subcategory</th>\
-                        <th>Sub Score</th>\
-                        <th>Topic</th>\
-                        <th>Weight</th>\
-                        <th>Point</th>\
-                        <th>Score</th>\
-                </tr></thead>\
-             </table >\
-        </div >';
+              <thead ><tr>\
+                      <th>#</th>\
+                      <th>Topic</th>\
+                      <th>Weight</th>\
+                      <th>Point</th>\
+                      <th>Score</th>\
+              </tr></thead>\
+            </table >\
+      </div >';
     }
      function renderingTable(tableName, data) {
       
@@ -328,7 +347,8 @@
           "columns": [
             {
               "data": null,
-              "width": '5%'
+              "width": '5%',
+              "class": "center-side"
             },
             // {
             //   "data": "Assmnt_Type.Title"
@@ -354,7 +374,7 @@
             {
               "width": "2.5%",
               "data": function (data, type, output) {
-                if (data.Assmnt_Subcategory.Title) return data.Score_Subcat + " / " + data.Score_Subcat_Max + " (" + Math.round(parseFloat(data.Score_Subcat) / parseFloat(data.Score_Subcat_Max) * 10000) / 100 + "%)"
+                if (data.Assmnt_Subcategory.Title) return data.Score_Subcat + " / " + data.Score_Subcat_Max + " (" + toFixedPecentage(Math.round(parseFloat(data.Score_Subcat) / parseFloat(data.Score_Subcat_Max) * 10000) / 100) + "%)"
                 else return "";
               },
             },
@@ -369,15 +389,18 @@
             },
             {
               "width": "5%",
-              "data": "Weight"
+              "data": "Weight",
+              "class": "right-side"
             },
             {
               "width": "5%",
-              "data": "Point"
+              "data": "Point",
+              "class": "right-side"
             },
             {
               "width": "5%",
-              "data": "Score"
+              "data": "Score",
+              "class": "right-side"
             }
 
           ],
@@ -410,7 +433,8 @@
         "columns": [
           {
             "data": null,
-            "width": '5%'
+            "width": '5%',
+            "class": "center-side"
           },
           // {
           //   "data": "Assmnt_Type.Title"
@@ -451,15 +475,18 @@
           },
           {
             "width": "5%",
-            "data": "Weight"
+            "data": "Weight",
+            "class": "right-side"
           },
           {
             "width": "5%",
-            "data": "Point"
+            "data": "Point",
+            "class": "right-side"
           },
           {
             "width": "5%",
-            "data": "Score"
+            "data": "Score",
+            "class": "right-side"
           }
 
         ],
@@ -597,12 +624,14 @@
       "pageLength": 20,
       "paging": false,
       "searching": false,
+      "info": false,
       "order": [['1', 'asc']],
       "processing": true,
       "columns": [
         {
           "data": null,
-          "width": '5%'
+          "width": '5%',
+          "class": "center-side"
         },
         {
           "data": "Cate_Name"
@@ -613,17 +642,20 @@
         },
         {
           "width": "10%",
-          "data": "Score"
+          "data": "Score",
+          "class": "right-side"
         },
         {
           "width": "10%",
-          "data": "Max_Score"
+          "data": "Max_Score",
+          "class": "right-side"
         },
         {
           "width": "2.5%",
           "data": function (data, type, output) {
             return  Math.round(parseFloat(data.Score) / parseFloat(data.Max_Score) * 10000) / 100 + "%"
           },
+          "class": "right-side"
         },
     
 
@@ -672,6 +704,8 @@
     }).draw();
   }
 
-
+  function toFixedPecentage(x) {
+    return Number.parseFloat(x).toFixed(2);
+  }
 
 </script>
