@@ -304,7 +304,7 @@
 
   function getHtmlTable(tableId, contentHeader) {
     return '<div class="containter" style="width: 100%;" align="center"> ' +
-      '<p style="background-color: #000000; color: white;">'+ contentHeader +'</p>'+
+      '<p style="background-color: #000000; color: white; font-size: 20;">'+ contentHeader +'</p>'+
       '<table id = "' + tableId + '" class="display" style = "width:100%" >\
               <thead ><tr>\
                       <th>#</th>\
@@ -320,7 +320,7 @@
   }
   function getHtmlTableWithoutSubcat(tableId, contentHeader) {
       return '<div class="containter" style="width: 100%;" align="center"> ' +
-        '<p style="background-color: #000000; color: white;">' + contentHeader + '</p>' +
+        '<p style="background-color: #000000; color: white;font-size: 20;">' + contentHeader + '</p>' +
         '<table id = "' + tableId + '" class="display" style = "width:100%" >\
               <thead ><tr>\
                       <th>#</th>\
@@ -350,19 +350,6 @@
               "width": '5%',
               "class": "center-side"
             },
-            // {
-            //   "data": "Assmnt_Type.Title"
-            // },
-            // {
-            //   "width": "10%",
-            //   "data": "Assmnt_Category.Title"
-            // },
-            // {
-            //   "width": "2.5%",
-            //   "data": function (data, type, output) {
-            //     return data.Score_Cat + " / " + data.Score_Cat_Max + " (" + Math.round(parseFloat(data.Score_Cat) / parseFloat(data.Score_Cat_Max) * 10000) / 100 + "%)"
-            //   },
-            // },
             {
               "width": "7.5%",
               "data": function (data, type, output) {
@@ -379,7 +366,7 @@
               },
             },
             {
-              "width": "52.5%",
+              "width": "77.5%",
               "data": function (data, type, output) {
                 var description = "- Description: " + (data.Description ? '<br/><pre>' + data.Description + "</pre>" : " - ")
                 var remark = "- Remarks: " + (data.Remarks ? '<br/><pre>' + data.Remarks + "</pre>" : " - ")
@@ -388,17 +375,17 @@
               }
             },
             {
-              "width": "5%",
+              "width": "2.5%",
               "data": "Weight",
               "class": "right-side"
             },
             {
-              "width": "5%",
+              "width": "2.5%",
               "data": "Point",
               "class": "right-side"
             },
             {
-              "width": "5%",
+              "width": "2.5%",
               "data": "Score",
               "class": "right-side"
             }
@@ -465,7 +452,7 @@
           //   },
           // },
           {
-            "width": "52.5%",
+            "width": "87.5%",
             "data": function (data, type, output) {
               var description = "- Description: " + (data.Description ? '<br/><pre>' + data.Description + "</pre>" : " - ")
               var remark = "- Remarks: " + (data.Remarks ? '<br/><pre>' + data.Remarks + "</pre>" : " - ")
@@ -474,17 +461,17 @@
             }
           },
           {
-            "width": "5%",
+            "width": "2.5%",
             "data": "Weight",
             "class": "right-side"
           },
           {
-            "width": "5%",
+            "width": "2.5%",
             "data": "Point",
             "class": "right-side"
           },
           {
-            "width": "5%",
+            "width": "2.5%",
             "data": "Score",
             "class": "right-side"
           }
