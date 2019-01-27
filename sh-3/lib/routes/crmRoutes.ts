@@ -11,7 +11,7 @@ import * as summary from './summary'
 dotenv.config()
 
 const staticPath = (path) => {
-  const out = (process.env.PATH_URL ? process.env.PATH_URL : "/node/sh-3") + path
+  const out = (process.env.PATH_URL ? process.env.PATH_URL : "/node/shananda/sh-3") + path
   return out
 }
 export class Routes {

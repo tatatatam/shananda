@@ -8,7 +8,7 @@ dotenv.config()
 
 
 const staticPath = (path) => {
-  const out = (process.env.PATH_URL ? process.env.PATH_URL : "/node/sh-4") + path
+  const out = (process.env.PATH_URL ? process.env.PATH_URL : "/node/shananda/sh-4") + path
   return out
 }
 export class Routes {
