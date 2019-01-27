@@ -143,14 +143,9 @@
 <script src="https://cdn.datatables.net/fixedcolumns/3.2.6/js/dataTables.fixedColumns.min.js"></script>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="/endpoint.js"></script>
 <script>
 
-  var url_dev = "http://localhost:3000";
-  var url_prod = "http://35.240.149.115:3001";
-  var trigger = 1;
-  if (location.hostname == "localhost") trigger = 0;
-  var url = trigger === 0 ? url_dev : url_prod;
-  console.log(url)
   var username = window.localStorage.getItem("username");
   var password = window.localStorage.getItem("password");
   $(document).ready(function () {

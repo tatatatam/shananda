@@ -84,13 +84,8 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-
+<script src="/endpoint.js"></script>
 <script>
-    var url_dev = "http://localhost:3000";
-    var url_prod = "http://35.240.149.115:3002";
-    var trigger = 1;
-    if (location.hostname == "localhost") trigger = 0;
-    var url = trigger === 0 ? url_dev : url_prod;
     var username = window.localStorage.getItem("username");
     var password = window.localStorage.getItem("password");
     $(document).ready(function () {

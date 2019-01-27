@@ -10,22 +10,25 @@ import * as evidence from './evidence'
 import * as summary from './summary'
 dotenv.config()
 
+const staticPath = (path) => {
+  const out = (process.env.PATH_URL ? process.env.PATH_URL : "/node/sh-3") + path
+  return out
+}
 export class Routes {
-
   public routes(app): void {
     
-    app.route('/').get( defect.test )
-    app.route('/auth').post(auth.login)
-    app.route('/filter').post(defect.filterData)
-    app.route('/dropdownlist').post(defect.dropdownList)
-    app.route("/grantlist").post(defect.grantList)
-    app.route('/defect').post(defect.defect)
-    app.route('/category').post(defect.category)
-    app.route('/document').post(defect.document)
+    app.route(staticPath('/')).get( defect.test )
+    app.route(staticPath('/auth')).post(auth.login)
+    app.route(staticPath('/filter')).post(defect.filterData)
+    app.route(staticPath('/dropdownlist')).post(defect.dropdownList)
+    app.route(staticPath("/grantlist")).post(defect.grantList)
+    app.route(staticPath('/defect')).post(defect.defect)
+    app.route(staticPath('/category')).post(defect.category)
+    app.route(staticPath('/document')).post(defect.document)
     
-    app.route('/evidence/dropdownlist').post(evidence.dropdownList)
-    app.route('/evidence/filter').get(evidence.evidencelsit)
+    app.route(staticPath('/evidence/dropdownlist')).post(evidence.dropdownList)
+    app.route(staticPath('/evidence/filter')).get(evidence.evidencelsit)
     
-    app.route('/summary').post(summary.getSumary)
+    app.route(staticPath('/summary')).post(summary.getSumary)
   }
 }
