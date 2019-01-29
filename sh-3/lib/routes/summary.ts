@@ -149,6 +149,15 @@ export const getSumary = (req: Request, res: Response) => {
     const password = req.body.password;
     const project = req.body.project;
     const isHas = req.body.isHas;
+    const category = req.body.category;
+    let sum_string = "&$filter="
+    let sum_string_cat  = ""
+    sum_string += " Project/ID eq '" + project + "'";
+    sum_string_cat+=sum_string
+    if (category != "0") {
+        sum_string += " and Category/ID eq '" + category + "'";
+        sum_string_cat += " and ID eq '" + category + "'";
+    }
     spauth
         .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
             username: username,
@@ -161,9 +170,9 @@ export const getSumary = (req: Request, res: Response) => {
             headers['ciphers'] = 'ECDHE-RSA-AES256-SHA:AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM';
             headers['honorCipherOrder'] = true;
 
-            const url_cat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$top=2000&$select=ID,Category_Code,Title,Is_Approved,Item_Type/Title,Project/ID&$expand=Item_Type,Project&$filter=Project/ID eq  " + project;
-            const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$top=2000&$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project&$filter=Project/ID eq " + project;
-            const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$top=2000&$select=ID,Title,Category/Category_Code,Category/ID,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status&$filter=Project/ID eq " + project;
+            const url_cat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_CATEGORY')/items?$top=2000&$select=ID,Category_Code,Title,Is_Approved,Item_Type/Title,Project/ID&$expand=Item_Type,Project" + sum_string_cat;
+            const url_subcat = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_SUBCATEGORY')/items?$top=2000&$select=ID,Subcategory_Code,Title,Category/ID,Category/Category_Code,Category/Title,Project/ID,Project/Title&$expand=Category,Project" + sum_string;
+            const url_defect = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT_INFO')/items?$top=2000&$select=ID,Title,Category/Category_Code,Category/ID,Category/Title,Sub_x002d_category/Subcategory_Code,Sub_x002d_category/Title,Project/ID,Project/Title,Defect_Status/Title&$expand=Project,Category,Sub_x002d_category,Defect_Status"+sum_string;
 
             request.get({
                 url: url_cat,
@@ -184,7 +193,6 @@ export const getSumary = (req: Request, res: Response) => {
                             //     return data.Assmnt_Subcategory.Title
                            
                         // })
-                        console.log(response_defect)
                         var catData = response_cat.d.results
                         var groupCatById = _.groupBy(response_cat.d.results, function (data) {
                             return data.ID
@@ -195,7 +203,7 @@ export const getSumary = (req: Request, res: Response) => {
                         var groupDefectById = _.groupBy(response_defect.d.results, function (data) {
                             return data.Category.ID
                         })
-                       
+                        
                         var groupSubcatByIdSubCat = _.groupBy(response_subcat.d.results, function (data) {
                             return data.Subcategory_Code
                         })
@@ -214,7 +222,7 @@ export const getSumary = (req: Request, res: Response) => {
                             groupPass[cat_id] = {PASS:0, NOT_PASS:0}
                             groupPass[cat_id]["PASS"] = pass
                             groupPass[cat_id]["NOT_PASS"] = notPass
-
+                            
                         }
                         var groupPass_sub = {}
                         for (var sub_cat_id in groupDefectByIdSubCat) {
@@ -228,9 +236,10 @@ export const getSumary = (req: Request, res: Response) => {
                             groupPass_sub[sub_cat_id] = { PASS: 0, NOT_PASS: 0 }
                             groupPass_sub[sub_cat_id]["PASS"] = pass
                             groupPass_sub[sub_cat_id]["NOT_PASS"] = notPass
-
+                            
                         }
                         
+                        console.log(groupPass_sub)
 
                         var outputData = []
                         console.log(isHas)
@@ -252,7 +261,7 @@ export const getSumary = (req: Request, res: Response) => {
                                 }
                             }
                         }
-                        console.log(outputData)
+                        // console.log(outputData)
                         //cat data
                         /*
                         for (var cat_id in groupSubcatById){

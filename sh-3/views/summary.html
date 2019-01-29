@@ -23,9 +23,17 @@
           Project
         </td>
         <td>
-          <select id="project-dl"">
+          <select id="project-dl" onchange="changeCategory()">
             <option value="0" disable>Please Select Project</option>
           </select>
+        </td>
+        <td>
+          Category
+        </td>
+        <td>
+          <select id="rp-ct-dl" onchange="chnageSubCate()">
+            <option value="0" disable>Please Select Category</option>
+          </select><br />
         </td>
       </tr>
       <tr>
@@ -120,34 +128,78 @@
         }
       }
     });
+    
   }
  
+     function changeCategory() {
+
+        var selectedProject = $("#project-dl").find(':selected').val()
+        $.ajax({
+          'url': url + '/dropdownlist',
+          dataType: 'json',
+          type: 'POST',
+          data: {
+            "username": username,
+            "password": password,
+            "dropdownlist": "category",
+            "project": selectedProject
+          },
+          success: function (response) {
+
+            var result = response.data
+            var data = $('#rp-ct-dl');
+            data.find("option").remove();
+            data.append('<option value="0" disable>Please Select Category</option>');
+            for (var i = 0; i < result.length; i += 1) {
+              $('#rp-ct-dl').append('<option  value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+            }
+          }
+        });
+
+
+      }
   
   function queryReportByStatusRpCompProject() {
     var selectedProject = $("#project-dl").find(':selected').val()
+    var selectedCategory = $("#rp-ct-dl").find(':selected').val()
     var selectedIsHas = $("#h-defect").prop('checked')
-    if (selectedProject != "0") {
-      //  $.ajax({
-      //   url: url + "/summary",
-      //   method: "POST",
-      //   data: {
-      //     "username": username,
-      //     "password": password,
-      //     "project": selectedProject
-      //   },
-      //   success: function (data) {  
-      //     console.log(data)
-      //   }
-      // });
-    
-      renderDataTable( selectedProject, selectedIsHas);
+    if (selectedProject != "0" && selectedCategory != "0") {
+   
+      renderDataTable( selectedProject, selectedIsHas, selectedCategory);
     } else {
       // $("#status-dl").wrapInner("<p>Error Herer</p>")
       alert("You have to choose select project")
     }
   }
+     function changeCategory() {
+       
+       var selectedProject = $("#project-dl").find(':selected').val()
+       $.ajax({
+         'url': url + '/dropdownlist',
+         dataType: 'json',
+         type: 'POST',
+         data: {
+           "username": username,
+           "password": password,
+           "dropdownlist": "category",
+           "project": selectedProject
+          },
+          success: function (response) {
+            
+            var result = response.data
+            var data = $('#rp-ct-dl');
+            data.find("option").remove();
+            data.append('<option value="0" disable>Please Select Category</option>');
+            for (var i = 0; i < result.length; i += 1) {
+              $('#rp-ct-dl').append('<option  value="' + result[i].Id + '" disable>' + result[i].Title + '</option>');
+            }
+          }
+        });
 
-  function renderDataTable( project, isHas) {
+        
+      }
+
+  function renderDataTable( project, isHas, category) {
     var dateDisplay = moment().format('DD/MM/YYYY');
     $("#dateDisplay").text(dateDisplay)
     $("#example").dataTable().fnDestroy()
@@ -177,6 +229,7 @@
           "username": username,
           "password": password,
           "project": project,
+          "category": category,
           "isHas": isHas
         },
         "dataSrc": function (d) {

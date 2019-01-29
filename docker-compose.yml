@@ -62,7 +62,7 @@ services:
     links:
       - back-3
     volumes:
-      - "./sh-3:/usr/share/nginx/html"
+      - "./sh-3/views:/usr/share/nginx/html"
     restart: always
   
   back-3:
@@ -86,7 +86,7 @@ services:
     links:
       - back-4
     volumes:
-      - "./sh-4:/usr/share/nginx/html"
+      - "./sh-4/views:/usr/share/nginx/html"
     restart: always
   
   back-4:
