@@ -6,7 +6,7 @@ if (location.hostname == "119.59.127.34") {
   url = url_prod_window
 } 
 else if (location.hostname == "http://35.240.149.115"){
-  url = url_prod_window
+  url = url_prod_linux
 } else {
   url = url_dev
 }
