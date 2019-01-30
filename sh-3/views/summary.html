@@ -167,8 +167,10 @@
    
       renderDataTable( selectedProject, selectedIsHas, selectedCategory);
     } else {
-      // $("#status-dl").wrapInner("<p>Error Herer</p>")
-      alert("You have to choose select project")
+      var err= ""
+      if(selectedProject == 0) err+= " project "
+      if(selectedCategory == 0) err+=" Category"
+      alert("You have to choose select ")
     }
   }
      function changeCategory() {
