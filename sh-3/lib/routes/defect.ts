@@ -44,7 +44,6 @@ export const filterData = (req: Request, res: Response) => {
   }
   let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$top=2000&$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
   url += "&$filter=" + sum_string + "&$orderby=ID";
-  console.log(url, password)
   
   spauth
     .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
@@ -62,11 +61,8 @@ export const filterData = (req: Request, res: Response) => {
         headers: headers,
         json: true,
         timeout: 1200000,
-        resolveWithFullResponse: true,
-        time: true
       }).then(response => {
-        console.log(response.elapsedTime)
-        res.status(200).send({
+        res.status(200).json({
           data: response.body.d
         })
       });
