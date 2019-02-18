@@ -11,6 +11,13 @@ export  const test = (req: Request, res: Response) => {
       })
     };
 
+export const timeOut = async (req: Request, res: Response) => {
+  await setTimeout(()=>{
+    console.log(50)
+    res.status(200).send('Timout')
+  },15000)
+}
+
 export const filterData = (req: Request, res: Response) => {
   const response_company = req.body.response;
   const category = req.body.category;
@@ -37,7 +44,8 @@ export const filterData = (req: Request, res: Response) => {
   }
   let url = "https://ananda365.sharepoint.com/sites/SmartHandover/_api/lists/getbytitle('SHO_DEFECT')/items?$top=2000&$select=ID,Defect_Code,Defect_Area_Image,Title,Description,Project/Title,Inspection/Title,Category/Title,Sub_x002d_category/Title,Defect_Status/Title,Target_Date,Created,Author/Title,Response_Company/Title,Defect_Image,Defect_Correction_IMG,Defect_Info/ID&$expand=Project,Inspection,Category,Sub_x002d_category,Defect_Status,Author,Response_Company,Defect_Info"
   url += "&$filter=" + sum_string + "&$orderby=ID";
-  console.log(username, password)
+  console.log(url, password)
+  
   spauth
     .getAuth('https://ananda365.sharepoint.com/sites/dev/', {
       username: username,
@@ -53,10 +61,14 @@ export const filterData = (req: Request, res: Response) => {
         url: url,
         headers: headers,
         json: true,
+        timeout: 150000,
+        resolveWithFullResponse: true,
+        time: true
       }).then(response => {
-        // console.log(response);
+        console.log(response.elapsedTime)
+        console.log(response);
         res.status(200).send({
-          data: response.d
+          data: response.body.d
         })
       });
     }).catch(err => {

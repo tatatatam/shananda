@@ -18,6 +18,8 @@ export class Routes {
   public routes(app): void {
     
     app.route(staticPath('/')).get( defect.test )
+    app.route(staticPath('/timeout')).get(defect.timeOut)
+
     app.route(staticPath('/auth')).post(auth.login)
     app.route(staticPath('/filter')).post(defect.filterData)
     app.route(staticPath('/dropdownlist')).post(defect.dropdownList)
