@@ -62,12 +62,13 @@ export const filterData = (req: Request, res: Response) => {
         json: true,
         timeout: 1200000,
       }).then(response => {
+        console.log(response.d)
         res.status(200).json({
-          data: response.body.d
+          data: response.d
         })
       });
     }).catch(err => {
-      console.log(err)
+      res.json(err)
     })
 }
 
