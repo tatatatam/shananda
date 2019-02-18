@@ -66,7 +66,6 @@ export const filterData = (req: Request, res: Response) => {
         time: true
       }).then(response => {
         console.log(response.elapsedTime)
-        console.log(response);
         res.status(200).send({
           data: response.body.d
         })

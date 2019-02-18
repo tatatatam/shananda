@@ -313,6 +313,7 @@ crossorigin="anonymous">
       "ajax": {
         "url": url + "/filter",
         // ?response="+response+"&status="+status+"&project="+project+"&category="+category+"&subcategory="+subcategory+"&page="+pageId+"&username="+username+"&password="+password,
+        "timeout": 1200000,
         "type": "POST",
         "data": {
           "username": username,
