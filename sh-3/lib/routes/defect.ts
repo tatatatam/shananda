@@ -61,7 +61,7 @@ export const filterData = (req: Request, res: Response) => {
         url: url,
         headers: headers,
         json: true,
-        timeout: 150000,
+        timeout: 1200000,
         resolveWithFullResponse: true,
         time: true
       }).then(response => {
