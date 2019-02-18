@@ -62,7 +62,7 @@ export const filterData = (req: Request, res: Response) => {
         json: true,
         timeout: 1200000,
       }).then(response => {
-        console.log(response.d)
+        if(response) console.log('success')
         res.status(200).json({
           data: response.d
         })
