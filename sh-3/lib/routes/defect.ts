@@ -61,10 +61,13 @@ export const filterData = (req: Request, res: Response) => {
         headers: headers,
         json: true,
         timeout: 1200000,
+        time:true,
+        resolveWithFullResponse: true
       }).then(response => {
         if(response) console.log('success')
+        console.log(response.elapsedTime)
         res.status(200).json({
-          data: response.d
+          data: response.body.d
         })
       });
     }).catch(err => {
