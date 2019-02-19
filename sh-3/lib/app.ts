@@ -2,7 +2,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Routes } from "./routes/crmRoutes";
 import * as cors from "cors";
-
+import * as timeout from "connect-timeout"
 class App {
 
   public app: express.Application;
@@ -15,9 +15,10 @@ class App {
   }
 
   private config(): void {
+    this.app.use(cors());
+    this.app.use(timeout(1500000))
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
-    this.app.use(cors());
   }
 }
 
