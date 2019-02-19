@@ -256,19 +256,20 @@ crossorigin="anonymous">
     var selectedProject = $("#project-dl").find(':selected').val()
     var selectedCategory = $("#rp-ct-dl").find(':selected').val()
     var selectedSubCategory = $("#rp-sct-dl").find(':selected').val()
-    console.log($('#global-num').text())
-    
-    if(selectedProject!="0"){
+    if(selectedProject!="0"&&selectedRespCom!="0"&& selectedStatus!="0"&&selectedCategory!="0"&& selectedSubCategory!="0"){
     $('#global-num').text(1);
         renderDataTable(selectedRespCom, selectedProject, selectedStatus, selectedCategory, selectedSubCategory, 0);
       }else {
-        // $("#status-dl").wrapInner("<p>Error Herer</p>")
+        var errMsg = selectedProject != "0"?"Please Select Project":""
+        errMsg+= selectedRespCom != "0" ? "Please Select Response Company" : ""
+         errMsg += selectedCategory != "0" ? "Please Select Category" : ""
+          errMsg += selectedStatus != "0" ? "Please Select Status" : ""
+           errMsg += selectedSubCategory != "0" ? "Please Select SubCategory" : ""
         alert("You have to choose select project")
       }
   }
    function nextQueryReport() {
      var urlNext = localStorage.getItem("next");
-     console.log(urlNext)
      if(urlNext){
        nextTable(urlNext);
      }
@@ -284,22 +285,7 @@ crossorigin="anonymous">
       //   alert("You have to choose select project")
       // }
     }
-    // function previousQueryReport(){
-    //    var selectedStatus = $("#status-dl").find(':selected').val();
-    //   var selectedRespCom = $("#rp-comp-dl").find(':selected').val()
-    //   var selectedProject = $("#project-dl").find(':selected').val()
-    //   var globalNum = parseInt($("#global-num").text())
-    //   if (selectedProject != "0" && globalNum != 0) {
-    //     if(globalNum>1){
-    //       $('#global-num').text(globalNum - 1)
-    //       renderDataTable(selectedRespCom, selectedProject, selectedStatus, globalNum-2);
-    //     }
-    //   } else {
-    //       // $("#status-dl").wrapInner("<p>Error Herer</p>")
-    //     alert("You have to choose select project")
-    //   }
-    // }
-    
+
   
   function renderDataTable(response, project, status, category, subcategory, pageId) {
      var dateDisplay = moment().format('DD/MM/YYYY');

@@ -7,4 +7,4 @@ const PORT = process.env.PORT;
 const server = app.listen(PORT, () => {
   console.log('Express server listening on port ' + PORT);
 })
-server.setTimeout(1200000)
+server.setTimeout(150000)
